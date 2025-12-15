@@ -120,16 +120,34 @@ static void _gui_input_loop() {
     
 }
 
+static void _gui_handle_resize(Rectangle old, Rectangle current) {
+    
+}
+
 static void (*gui_render_loop)() = &_gui_render_loop;
 static void (*gui_input_loop)() = &_gui_input_loop;
+static void (*gui_handle_resize)(Rectangle old, Rectangle current) = &_gui_handle_resize;
 
 static void gui_replace_loops(void (*render_loop)(), void (*input_loop)()) {
     gui_render_loop = render_loop;
     gui_input_loop = input_loop;
 }
 
+static void gui_replace_handle_resize(void (*handle_resize)(Rectangle old, Rectangle current)) {
+    gui_handle_resize = handle_resize;
+}
+
+static Rectangle _gui_old = { 0, 0, 0, 0 };
+static Rectangle _gui_new = { 0, 0, 0, 0 };
+
 static void gui_init() {
     while(!WindowShouldClose()) {
+
+
+        if(IsWindowResized()) {
+            gui_handle_resize(_gui_old, _gui_new);
+        }
+
         gui_input_loop();
         gui_render_loop();
     }
@@ -377,6 +395,7 @@ static void gui_draw_button(gui_button_t button, bool blocked) {
     if(!button.enabled) {
         gui_draw_rectangle_round(button.rect, button.disabled);
     } else if(gui_point_in_rect(cursor, rect)) {
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
         if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             gui_draw_rectangle_round(button.rect, button.clicked);
             goto end;

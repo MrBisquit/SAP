@@ -4,6 +4,7 @@
 int main(int argc, char* argv[]) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, "Dots And Boxes");
+    SetWindowMinSize(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT);
     SetTargetFPS(WINDOW_TARGET_FPS);
 
     // This system is cool, because it allows us to switch between modes easily
