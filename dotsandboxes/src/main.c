@@ -1,6 +1,8 @@
 #include "main.h"
 #include "../../utils/src/GameUI.h"
 
+THEME gui_theme = THEME_DARK;
+
 int main(int argc, char* argv[]) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_DEFAULT_WIDTH, WINDOW_DEFAULT_HEIGHT, "Dots And Boxes");
@@ -18,8 +20,20 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+void game_start_menu() {
+    game_enter_mode(MODE_MENU);
+}
+
 void game_start_game() {
     game_enter_mode(MODE_GAME);
+}
+
+void game_start_options() {
+    game_enter_mode(MODE_OPTIONS);
+}
+
+void game_start_credits() {
+    game_enter_mode(MODE_CREDITS);
 }
 
 void game_game_render_loop() {

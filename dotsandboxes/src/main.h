@@ -2,6 +2,8 @@
 
 #include "../../utils/src/GameUI.h"
 
+#define AI_NAME "SAP-GameAI-N/A-LN/A"
+
 typedef struct mode {
     void (*render_loop)();
     void (*input_loop)();
@@ -17,7 +19,10 @@ enum {
 };
 static int current_mode = MODE_MENU;
 
+void game_start_menu();
 void game_start_game();
+void game_start_options();
+void game_start_credits();
 
 void game_menu_render_loop();
 void game_menu_input_loop();

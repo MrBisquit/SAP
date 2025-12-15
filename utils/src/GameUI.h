@@ -27,7 +27,7 @@ typedef enum {
     THEME_DARK
 } THEME;
 
-static THEME gui_theme = THEME_DARK;
+extern THEME gui_theme;
 
 typedef struct {
     const char* key;
@@ -142,7 +142,7 @@ static Rectangle _gui_new = { 0, 0, 0, 0 };
 
 static void gui_init() {
     while(!WindowShouldClose()) {
-
+        // TODO: Functionality for getting the old and new sizes
 
         if(IsWindowResized()) {
             gui_handle_resize(_gui_old, _gui_new);
