@@ -7,6 +7,7 @@ SAP stands for **S**imple **A**I **P**rojects, which is this collection of games
 
 ## Naming Scheme
 SAP algorithms must follow a naming scheme, there are 2 versions, the identifyable "Algorithm", and the code name (which can be like a cooler name for it).
+The name of the directory is just the game, if there are variants for it, the name can be changed later.
 
 ### SAP-GameAI
 
