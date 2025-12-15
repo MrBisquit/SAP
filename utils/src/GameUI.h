@@ -159,6 +159,13 @@ typedef struct gui_button {
     bool enabled;           // Button enabled
 } gui_button_t;
 
+typedef struct gui_textblock {
+    const char* text;
+    Color color;
+    int fontSize;
+    Vector2 position;
+} gui_textblock_t;
+
 /// @brief Generates a text with the default colors
 /// @param text The text
 /// @param fontSize The font size
@@ -168,6 +175,21 @@ static gui_text_t gui_generate_text(const char* text, int fontSize) {
         text,
         gui_get_color("TEXT"),
         fontSize
+    };
+
+    return _text;
+}
+
+/// @brief Generates a text with the default colors
+/// @param text The text
+/// @param fontSize The font size
+/// @return The text struct
+static gui_textblock_t gui_generate_textblock(const char* text, int fontSize, Vector2 position) {
+    gui_textblock_t _text = {
+        text,
+        gui_get_color("TEXT"),
+        fontSize,
+        position
     };
 
     return _text;
@@ -193,6 +215,7 @@ static gui_button_t gui_generate_button(RoundRectangle rect, gui_text_t text) {
 
 #define BTN gui_generate_button
 #define TXT gui_generate_text
+#define TXB gui_generate_textblock
 
 /// @brief Seeds the random algorithm
 static void gui_rand_seed(void) {
@@ -294,6 +317,13 @@ static bool gui_button_pressed(gui_button_t button, int mouse_button, Vector2 po
 static void gui_draw_text(const char* text, int posX, int posY, int fontSize, Color color) {
     // This seems pointless now, but I plan on adding support for fonts later
     DrawText(text, posX, posY, fontSize, color);
+}
+
+/// @brief Draws a textblock
+/// @param text The textblock to draw
+static void gui_draw_textblock(gui_textblock_t text) {
+    // This seems pointless now, but I plan on adding support for fonts later
+    DrawText(text.text, text.position.x, text.position.y, text.fontSize, text.color);
 }
 
 /// @brief Draws text at the center of a rectangle

@@ -4,11 +4,15 @@
 
 void game_menu_render_loop() {
     BeginDrawing();
-    ClearBackground(BLACK);
+    ClearBackground(gui_get_color("BACKGROUND"));
 
     DrawFPS(GetRenderWidth() - 100, 10);
 
+    gui_draw_textblock(game_menu_title);
+    gui_draw_textblock(game_menu_subtitle);
     gui_draw_button(game_menu_play_button, false);
+    gui_draw_button(game_menu_options_button, false);
+    gui_draw_button(game_menu_credits_button, false);
 
     EndDrawing();
 }
@@ -29,14 +33,41 @@ void game_menu_input_loop() {
     if(gui_button_pressed(game_menu_play_button, MOUSE_BUTTON_LEFT, cursor)) {
         game_start_game();
     }
+
+    if(gui_button_pressed(game_menu_options_button, MOUSE_BUTTON_LEFT, cursor)) {
+        
+    }
+
+    if(gui_button_pressed(game_menu_credits_button, MOUSE_BUTTON_LEFT, cursor)) {
+        
+    }
 }
 
 void game_menu_init() {
+    game_menu_title = TXB("Dots And Boxes", 50, (Vector2){ 35, 35 });
+    game_menu_subtitle = TXB("A SAP Project - Made by William Dawson", 15, (Vector2){ 35, 35 + 50 + 10 });
+
     game_menu_play_button = BTN((RoundRectangle){
-        10,
-        10,
-        100,
-        40,
-        0
+        35,
+        35 + 50 + 10 + (10 + 15 + 15),
+        50 * 14,
+        40 + 50,
+        0.25
     }, TXT("Play", 25));
+
+    game_menu_options_button = BTN((RoundRectangle){
+        35,
+        35 + 50 + 10 + (40 + 50 + 10) + (10 + 15 + 15),
+        50 * 14,
+        40,
+        0.5
+    }, TXT("Options", 25));
+
+    game_menu_credits_button = BTN((RoundRectangle){
+        35,
+        35 + 50 + 10 + (40 + 50 + 10) + (40 + 10) + (10 + 15 + 15),
+        50 * 14,
+        40,
+        0.5
+    }, TXT("Credits", 25));
 }
