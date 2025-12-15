@@ -2,7 +2,7 @@
 
 #include "../../utils/src/GameUI.h"
 
-#define AI_NAME "SAP-GameAI-N/A-LN/A"
+#define AI_NAME "SAP-GameAI-DotsAndBoxes-L3"
 
 typedef struct mode {
     void (*render_loop)();
