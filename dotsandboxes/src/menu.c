@@ -37,11 +37,11 @@ void game_menu_input_loop() {
     }
 
     if(gui_button_pressed(game_menu_options_button, MOUSE_BUTTON_LEFT, cursor)) {
-        
+        game_enter_mode(MODE_OPTIONS);
     }
 
     if(gui_button_pressed(game_menu_credits_button, MOUSE_BUTTON_LEFT, cursor)) {
-        
+        game_enter_mode(MODE_CREDITS);
     }
 }
 
