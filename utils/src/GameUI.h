@@ -272,6 +272,19 @@ static RoundRectangle gui_rect_to_round(Rectangle rect) {
     return _rect;
 }
 
+/// @brief Checks if a button is being pressed
+/// @param button The button object
+/// @param mouse_button The mouse button to detect
+/// @param point The current cursor position
+/// @return Whether or not the button is being pressed
+static bool gui_button_pressed(gui_button_t button, int mouse_button, Vector2 point) {
+    if(gui_point_in_rect(point, gui_round_to_rect(button.rect)) &&
+        IsMouseButtonPressed(mouse_button) && button.enabled)
+        return true;
+    else
+        return false;
+}
+
 /// @brief Draws text
 /// @param text The text to draw
 /// @param posX The X position

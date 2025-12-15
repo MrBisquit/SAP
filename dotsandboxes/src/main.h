@@ -14,6 +14,8 @@ enum {
 };
 static int current_mode = MODE_MENU;
 
+void game_start_game();
+
 void game_menu_render_loop();
 void game_menu_input_loop();
 void game_menu_init();

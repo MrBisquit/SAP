@@ -17,13 +17,15 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-
+void game_start_game() {
+    game_enter_mode(MODE_GAME);
+}
 
 void game_game_render_loop() {
     BeginDrawing();
     ClearBackground(BLACK);
 
-    
+    DrawFPS(GetRenderWidth() - 100, 10);
 
     EndDrawing();
 }
