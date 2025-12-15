@@ -20,8 +20,8 @@ lower its chance of being picked.
 In the example below, you can see this rule.
 
 ![Example C](<images/Dots And Boxes (SAP-GameAI-DotsAndBoxes-L3) 3.png>)
-![Example D](<images/Dots And Boxes (SAP-GameAI-DotsAndBoxes-L3) 5.png>)
-![Example E](<images/Dots And Boxes (SAP-GameAI-DotsAndBoxes-L3) 4.png>)
+![Example D](<images/Dots And Boxes (SAP-GameAI-DotsAndBoxes-L3) 4.png>)
+![Example E](<images/Dots And Boxes (SAP-GameAI-DotsAndBoxes-L3) 5.png>)
 
 This algorithm does have a feature that is enabled by default, which allows the algorithm to pick the top 3
 choices, and use the pseudo random algorithm to pick between them, which allows for a fairer game.
