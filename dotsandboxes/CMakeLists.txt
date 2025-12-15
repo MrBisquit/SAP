@@ -5,6 +5,8 @@ file(GLOB_RECURSE DOTSANDBOXES_SRC_FILES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
 
+message(STATUS "Files: ${DOTSANDBOXES_SRC_FILES}")
+
 add_executable(dotsandboxes ${DOTSANDBOXES_SRC_FILES} ${UTILS_FILES})
 target_link_libraries(dotsandboxes raylib)
 

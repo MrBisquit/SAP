@@ -19,6 +19,122 @@
 #define ROUNDING_DEFAULT        0.5f
 #define ROUNDING_POPUP          0.05f
 
+#define COLORS_BACKGROUND_LIGHT { .r = 227, .g = 227, .b = 227, .a = 255 }
+#define COLORS_BACKGROUND_DARK  { .r = 23,  .g = 23,  .b = 23,  .a = 255 }
+
+typedef enum {
+    THEME_LIGHT,
+    THEME_DARK
+} THEME;
+
+static THEME gui_theme = THEME_DARK;
+
+typedef struct {
+    const char* key;
+    Color light;
+    Color dark;
+} ThemeColor;
+
+static const ThemeColor gui_theme_colors[8] = {
+    {
+        "BACKGROUND",
+        { .r = 227, .g = 227, .b = 227, .a = 255 }, // #E3E3E3 (0xE3E3E3)
+        { .r = 23,  .g = 23,  .b = 23,  .a = 255 }  // #171717 (0x171717)
+    },
+    {
+        "TEXT",
+        { .r = 27,  .g = 27,  .b = 27,  .a = 255 }, // #1B1B1B (0x1B1B1B)
+        { .r = 255, .g = 255, .b = 255, .a = 255 }  // #FFFFFF (0xFFFFFF)
+    },
+    {
+        "OVERLAY",
+        { .r =   0, .g =   0, .b =   0, .a = 128 }, // #000000 (0x000000)
+        { .r =   0, .g =   0, .b =   0, .a = 200 }, // #000000 (0x000000)
+    },
+
+    // Button
+    {
+        "BUTTON",
+        { .r = 180, .g = 180, .b = 180, .a = 128 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 128 }   // #505050 (0x505050)
+    },
+    {
+        "BUTTON_HOVER",
+        { .r = 180, .g = 180, .b = 180, .a = 200 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 200 }   // #505050 (0x505050)
+    },
+    {
+        "BUTTON_CLICKED",
+        { .r = 180, .g = 180, .b = 180, .a = 240 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 240 }   // #505050 (0x505050)
+    },
+    {
+        "BUTTON_DISABLED",
+        { .r = 180, .g = 180, .b = 180, .a = 80 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 80 }   // #505050 (0x505050)
+    },
+
+    // Popups
+    {
+        "POPUP_BACKGROUND",
+        { .r = 227, .g = 227, .b = 227, .a = 255 }, // #E3E3E3 (0xE3E3E3)
+        { .r = 50,  .g = 50,  .b = 50,  .a = 255 }, // #323232 (0x323232)
+    }
+};
+
+/// @brief Gets a colour from the current theme
+/// @param name The name of the colour
+/// @param theme The theme
+/// @return The colour (Or #C824B1 (199, 36, 177) if it's not found)
+static Color gui_get_color_theme(const char* name, THEME theme) {
+    for(size_t i = 0; i < sizeof(gui_theme_colors) / sizeof(ThemeColor); i++) {
+        if(strcmp(name, gui_theme_colors[i].key) == 0)
+        {
+            if(theme == THEME_LIGHT) {
+                return gui_theme_colors[i].light;
+            } else {
+                return gui_theme_colors[i].dark;
+            }
+        }
+    }
+    return (Color) { .r = 199, .g = 36, .b = 177, .a = 255 }; // Neon purple (#C724B1)
+}
+
+/// @brief Gets a colour from the current theme
+/// @param name The name of the colour
+/// @return The colour (Or #C824B1 (199, 36, 177) if it's not found)
+static Color gui_get_color(const char* name) {
+    return gui_get_color_theme(name, gui_theme);
+}
+
+static void _gui_render_loop() {
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    DrawText("No render loop", 10, 10, 15, RED);
+
+    EndDrawing();
+}
+
+static void _gui_input_loop() {
+    
+}
+
+static void (*gui_render_loop)() = &_gui_render_loop;
+static void (*gui_input_loop)() = &_gui_input_loop;
+
+static void gui_replace_loops(void (*render_loop)(), void (*input_loop)()) {
+    gui_render_loop = render_loop;
+    gui_input_loop = input_loop;
+}
+
+static void gui_init() {
+    while(!WindowShouldClose()) {
+        gui_input_loop();
+        gui_render_loop();
+    }
+}
+
 typedef struct RoundRectangle {
     float x;                // Rectangle top-left corner position x
     float y;                // Rectangle top-left corner position y
@@ -42,6 +158,41 @@ typedef struct gui_button {
     gui_text_t text;        // Button text
     bool enabled;           // Button enabled
 } gui_button_t;
+
+/// @brief Generates a text with the default colors
+/// @param text The text
+/// @param fontSize The font size
+/// @return The text struct
+static gui_text_t gui_generate_text(const char* text, int fontSize) {
+    gui_text_t _text = {
+        text,
+        gui_get_color("TEXT"),
+        fontSize
+    };
+
+    return _text;
+}
+
+/// @brief Generates a button with the default colors
+/// @param rect The button rectangle
+/// @param text The text inside the button
+/// @return The button struct
+static gui_button_t gui_generate_button(RoundRectangle rect, gui_text_t text) {
+    gui_button_t button = {
+        rect,
+        .text = text,
+        .normal = gui_get_color("BUTTON"),
+        .hover = gui_get_color("BUTTON_HOVER"),
+        .clicked = gui_get_color("BUTTON_CLICKED"),
+        .disabled = gui_get_color("BUTTON_DISABLED"),
+        .enabled = true
+    };
+    
+    return button;
+}
+
+#define BTN gui_generate_button
+#define TXT gui_generate_text
 
 /// @brief Seeds the random algorithm
 static void gui_rand_seed(void) {
