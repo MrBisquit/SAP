@@ -1,9 +1,14 @@
 # **S**imple **A**I **P**rojects
 SAP stands for **S**imple **A**I **P**rojects, which is this collection of games with simple AI algorithms for bots.
+These games will use Raylib, with a central UI library so that they are all consistent with a consistent colour scheme.
 
 ## SAP-GameAI
 | Game | Algorithm | Code Name | Link |
 |:-----|:----------|:----------|:-----|
+
+Planned:
+- Dots and Boxes game
+- Add in previous games (nacbot, bsbot, etc)
 
 ## Naming Scheme
 SAP algorithms must follow a naming scheme, there are 2 versions, the identifyable "Algorithm", and the code name (which can be like a cooler name for it).
