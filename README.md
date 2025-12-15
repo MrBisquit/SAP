@@ -3,11 +3,11 @@ SAP stands for **S**imple **A**I **P**rojects, which is this collection of games
 These games will use Raylib, with a central UI library so that they are all consistent with a consistent colour scheme.
 
 ## SAP-GameAI
-| Game | Algorithm | Code Name | Link |
-|:-----|:----------|:----------|:-----|
+| Game           | Algorithm | Code Name | Link                                      |
+| :------------- | :-------- | :-------- | :---------------------------------------- |
+| Dots And Boxes |           |           | [Dots And Boxes](/dotsandboxes/README.md) |
 
 Planned:
-- Dots and Boxes game
 - Add in previous games (nacbot, bsbot, etc)
 
 ## Naming Scheme
@@ -17,7 +17,7 @@ The name of the directory is just the game, if there are variants for it, the na
 ### SAP-GameAI
 
 | Level | Code | Definition                 |
-|:------|:-----|:---------------------------|
+| :---- | :--- | :------------------------- |
 | 0     | `L0` | Random based, basic        |
 | 1     | `L1` | Simple, and rule based     |
 | 2     | `L2` | Reactive, a little smarter |
