@@ -35,7 +35,7 @@ typedef struct {
     Color dark;
 } ThemeColor;
 
-static const ThemeColor gui_theme_colors[8] = {
+static const ThemeColor gui_theme_colors[12] = {
     {
         "BACKGROUND",
         { .r = 227, .g = 227, .b = 227, .a = 255 }, // #E3E3E3 (0xE3E3E3)
@@ -70,6 +70,28 @@ static const ThemeColor gui_theme_colors[8] = {
     },
     {
         "BUTTON_DISABLED",
+        { .r = 180, .g = 180, .b = 180, .a = 80 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 80 }   // #505050 (0x505050)
+    },
+
+    // Checkbox
+    {
+        "CHECKBOX",
+        { .r = 180, .g = 180, .b = 180, .a = 128 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 128 }   // #505050 (0x505050)
+    },
+    {
+        "CHECKBOX_HOVER",
+        { .r = 180, .g = 180, .b = 180, .a = 200 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 200 }   // #505050 (0x505050)
+    },
+    {
+        "CHECKBOX_CLICKED",
+        { .r = 180, .g = 180, .b = 180, .a = 240 },  // #B4B4B4 (0xB4B4B4)
+        { .r = 80,  .g = 80,  .b = 80,  .a = 240 }   // #505050 (0x505050)
+    },
+    {
+        "CHECKBOX_DISABLED",
         { .r = 180, .g = 180, .b = 180, .a = 80 },  // #B4B4B4 (0xB4B4B4)
         { .r = 80,  .g = 80,  .b = 80,  .a = 80 }   // #505050 (0x505050)
     },
@@ -184,6 +206,31 @@ typedef struct gui_textblock {
     Vector2 position;
 } gui_textblock_t;
 
+typedef struct gui_checkbox {
+    RoundRectangle rect;
+
+    Color outline;
+    Color inside;
+
+    Color outline_disabled;
+    Color inside_disabled;
+} gui_checkbox_t;
+
+typedef struct gui_text_checkbox {
+    gui_text_t text;
+    int text_pos; // 0 = Left, 1 = Right
+    RoundRectangle rect;
+
+    Color outline;
+    Color inside;
+
+    Color outline_hover;
+    Color inside_hover;
+
+    Color outline_disabled;
+    Color inside_disabled;
+} gui_text_checkbox_t;
+
 /// @brief Generates a text with the default colors
 /// @param text The text
 /// @param fontSize The font size
@@ -211,6 +258,14 @@ static gui_textblock_t gui_generate_textblock(const char* text, int fontSize, Ve
     };
 
     return _text;
+}
+
+static gui_checkbox_t gui_generate_checkbox(RoundRectangle rect) {
+    gui_checkbox_t _checkbox = {
+        rect,
+
+
+    };
 }
 
 /// @brief Generates a button with the default colors

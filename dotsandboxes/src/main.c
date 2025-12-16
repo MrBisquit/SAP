@@ -25,7 +25,7 @@ void game_start_menu() {
 }
 
 void game_start_game() {
-    game_enter_mode(MODE_GAME);
+    game_enter_mode(MODE_GAME_OPTIONS);
 }
 
 void game_start_options() {
@@ -34,6 +34,10 @@ void game_start_options() {
 
 void game_start_credits() {
     game_enter_mode(MODE_CREDITS);
+}
+
+void game_start_game_options() {
+    game_enter_mode(MODE_GAME_OPTIONS);
 }
 
 void game_game_render_loop() {
