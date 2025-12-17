@@ -13,7 +13,9 @@ void game_game_options_render_loop() {
     gui_draw_textblock(game_game_options_title);
     gui_draw_textblock(game_game_options_subtitle);
 
-    
+    gui_draw_button(game_game_options_normal_4x4, false);
+    gui_draw_button(game_game_options_normal_5x4, false);
+    gui_draw_button(game_game_options_normal_6x5, false);
 
     gui_draw_button(game_game_options_back_button, false);
 
@@ -64,6 +66,30 @@ void game_game_options_init() {
         35 + 50 + 10 + y_offset
     });
 
+    game_game_options_normal_4x4 = BTN((RoundRectangle){
+        35 + (((50 * 7) + 10) * 0) + x_offset,
+        35 + 50 + 10 + (15 + 10) + y_offset,
+        50 * 7,
+        120,
+        0.2
+    }, TXT("4x4", 25));
+
+    game_game_options_normal_5x4 = BTN((RoundRectangle){
+        35 + (((50 * 7) + 10) * 1) + x_offset,
+        35 + 50 + 10 + (15 + 10) + y_offset,
+        50 * 7,
+        120,
+        0.2
+    }, TXT("5x4", 25));
+
+    game_game_options_normal_6x5 = BTN((RoundRectangle){
+        35 + (((50 * 7) + 10) * 2) + x_offset,
+        35 + 50 + 10 + (15 + 10) + y_offset,
+        50 * 7,
+        120,
+        0.2
+    }, TXT("6x5", 25));
+
     game_game_options_back_button = BTN((RoundRectangle){
         35 + x_offset,
         GetRenderHeight() - y_offset - (35 * 2),
@@ -74,5 +100,5 @@ void game_game_options_init() {
 }
 
 void game_game_options_handle_resize(Rectangle old, Rectangle current) {
-    game_game_init();
+    game_game_options_init();
 }

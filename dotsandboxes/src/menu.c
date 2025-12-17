@@ -90,7 +90,7 @@ void game_menu_init() {
         50 * 14,
         40,
         0.5
-    }, TXT("Credits", 25));
+    }, TXT("Credits & About", 25));
 }
 
 void game_menu_handle_resize(Rectangle old, Rectangle current) {

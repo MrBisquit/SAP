@@ -208,18 +208,8 @@ typedef struct gui_textblock {
 
 typedef struct gui_checkbox {
     RoundRectangle rect;
-
-    Color outline;
-    Color inside;
-
-    Color outline_disabled;
-    Color inside_disabled;
-} gui_checkbox_t;
-
-typedef struct gui_text_checkbox {
-    gui_text_t text;
-    int text_pos; // 0 = Left, 1 = Right
-    RoundRectangle rect;
+    bool radio;
+    bool enabled;
 
     Color outline;
     Color inside;
@@ -229,6 +219,29 @@ typedef struct gui_text_checkbox {
 
     Color outline_disabled;
     Color inside_disabled;
+
+    Color outline_clicked;
+    Color inside_clicked;
+} gui_checkbox_t;
+
+typedef struct gui_text_checkbox {
+    gui_text_t text;
+    int text_pos; // 0 = Left, 1 = Right
+    RoundRectangle rect;
+    bool radio;
+    bool enabled;
+
+    Color outline;
+    Color inside;
+
+    Color outline_hover;
+    Color inside_hover;
+
+    Color outline_disabled;
+    Color inside_disabled;
+
+    Color outline_clicked;
+    Color inside_clicked;
 } gui_text_checkbox_t;
 
 /// @brief Generates a text with the default colors
@@ -260,11 +273,23 @@ static gui_textblock_t gui_generate_textblock(const char* text, int fontSize, Ve
     return _text;
 }
 
-static gui_checkbox_t gui_generate_checkbox(RoundRectangle rect) {
+static gui_checkbox_t gui_generate_checkbox(RoundRectangle rect, bool radio) {
     gui_checkbox_t _checkbox = {
         rect,
+        radio,
+        true,
 
+        gui_get_color("CHECKBOX"),
+        gui_get_color("CHECKBOX"),
 
+        gui_get_color("CHECKBOX_HOVER"),
+        gui_get_color("CHECKBOX_HOVER"),
+
+        gui_get_color("CHECKBOX_DISABLED"),
+        gui_get_color("CHECKBOX_DISABLED"),
+
+        gui_get_color("CHECKBOX_CLICKED"),
+        gui_get_color("CHECKBOX_CLICKED")
     };
 }
 
@@ -436,6 +461,14 @@ static void gui_draw_rectangle_round(RoundRectangle rect, Color color) {
 
 static void gui_draw_rectangle_round_outline(RoundRectangle rect, Color color) {
     DrawRectangleRoundedLines(gui_round_to_rect(rect), rect.rounded, 4 + (4 * rect.rounded), color);
+}
+
+static void gui_draw_checkbox(gui_checkbox_t checkbox, bool blocked) {
+
+}
+
+static void gui_draw_checkbox_text(gui_text_checkbox_t checkbox, bool blocked) {
+
 }
 
 /// @brief Draws a button
