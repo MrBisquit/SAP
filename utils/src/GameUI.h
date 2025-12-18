@@ -183,6 +183,14 @@ typedef struct RoundRectangle {
     float rounded;          // Rectangle roundness
 } RoundRectangle;
 
+typedef struct gui_circle {
+    float x;                // Center/top-left position x
+    float y;                // Center/top-left position y
+    float size;             // Size from center outward (radius)
+    int pos_mode;           // 0 = From center, 1 = From top-left
+    bool fill;              // Filled circle
+} gui_circle_t;
+
 typedef struct gui_text {
     const char* text;
     Color color;
@@ -311,9 +319,28 @@ static gui_button_t gui_generate_button(RoundRectangle rect, gui_text_t text) {
     return button;
 }
 
+/// @brief Generates a circle from the values provided
+/// @param point The point from either the top-left, or center
+/// @param size The size from the center outward
+/// @param mode The position mode (0 = Center, 1 = Top-left)
+/// @param fill Whether or not the circle is filled
+/// @return 
+static gui_circle_t gui_generate_circle(Vector2 point, float size, int mode, bool fill) {
+    gui_circle_t circle = {
+        point.x,
+        point.y,
+        size,
+        mode,
+        fill
+    };
+
+    return circle;
+}
+
 #define BTN gui_generate_button
 #define TXT gui_generate_text
 #define TXB gui_generate_textblock
+#define CIR gui_generate_circle
 
 /// @brief Seeds the random algorithm
 static void gui_rand_seed(void) {
@@ -361,6 +388,22 @@ static bool gui_point_in_rect(Vector2 point, Rectangle rect) {
     float y2 = rect.y + rect.height;
 
     return px >= x1 && px <= x2 && py >= y1 && py <= y2;
+}
+
+/// @brief Check if 2 circles overlap
+/// @param a Circle A
+/// @param b Circle B
+/// @return `true` if the circles overlap, `false` if not
+static bool gui_circle_overlap(gui_circle_t a, gui_circle_t b) {
+    // TODO: Functionality for gui_circle_overlap
+}
+
+/// @brief Checks if the point is in the circle
+/// @param point The point
+/// @param circle The circle
+/// @return `true` if the point is inside the circle, `false` if not
+static bool gui_point_in_circle(Vector2 point, gui_circle_t circle) {
+    // TODO: Functionality foe gui_point_in_circle
 }
 
 /// @brief Converts a `RoundRectangle` to a `Rectangle`
@@ -455,20 +498,98 @@ static void gui_draw_text_center_offset(const char* text, Rectangle rect, Vector
     gui_draw_text(text, x, y, fontSize, color);
 }
 
+/// @brief Draws a filled rounded rectangle
+/// @param rect The rounded rectangle
+/// @param color The color to use when drawing the rounded rectangle
 static void gui_draw_rectangle_round(RoundRectangle rect, Color color) {
     DrawRectangleRounded(gui_round_to_rect(rect), rect.rounded, 4 + (4 * rect.rounded), color);
 }
 
+/// @brief Draw a rounded rectangle outline
+/// @param rect The rounded rectangle
+/// @param color The color to use when drawing the rounded rectangle
 static void gui_draw_rectangle_round_outline(RoundRectangle rect, Color color) {
     DrawRectangleRoundedLines(gui_round_to_rect(rect), rect.rounded, 4 + (4 * rect.rounded), color);
 }
 
-static void gui_draw_checkbox(gui_checkbox_t checkbox, bool blocked) {
+/// @brief Gets the X and Y values from a rounded rectangle
+/// @param rect The rounded rectangle
+/// @return The X and Y values
+static Vector2 gui_pos_from_round_rect(RoundRectangle rect) {
+    Vector2 pos = {
+        rect.x,
+        rect.y
+    };
 
+    return pos;
 }
 
-static void gui_draw_checkbox_text(gui_text_checkbox_t checkbox, bool blocked) {
+/// @brief Gets the X and Y values from a rectangle
+/// @param rect The rectangle
+/// @return The X and Y values
+static Vector2 gui_pos_from_rect(Rectangle rect) {
+    Vector2 pos = {
+        rect.x,
+        rect.y
+    };
 
+    return pos;
+}
+
+/// @brief Draws a filled circle (overrides circle fill value)
+/// @param circle The circle to draw
+/// @param color The color the draw the circle with
+static void gui_draw_circle_fill(gui_circle_t circle, Color color) {
+    if(circle.pos_mode == 0) {
+        DrawCircle(circle.x, circle.y, circle.size, color);
+    } else if(circle.pos_mode == 1) {
+        DrawCircle(circle.x + circle.size, circle.y + circle.y, circle.size, color);
+    }
+}
+
+/// @brief Draws an outlined circle (overrides the circle fill value)
+/// @param circle The circle to draw
+/// @param color The color to draw the circle with
+static void gui_draw_circle_outline(gui_circle_t circle, Color color) {
+    if(circle.pos_mode == 0) {
+        DrawCircleLines(circle.x, circle.y, circle.size, color);
+    } else if(circle.pos_mode == 1) {
+        DrawCircleLines(circle.x + circle.size, circle.y + circle.y, circle.size, color);
+    }
+}
+
+/// @brief Draws a circle
+/// @param circle The circle to draw
+/// @param color The color to draw the circle with
+static void gui_draw_circle(gui_circle_t circle, Color color) {
+    if(circle.fill) {
+        gui_draw_circle_fill(circle, color);
+    } else {
+        gui_draw_circle_outline(circle, color);
+    }
+}
+
+/// @brief Draws a checkbox
+/// @param checkbox The checkbox to draw
+/// @param blocked Whether input is blocked (Overrides states)
+static void gui_draw_checkbox(gui_checkbox_t checkbox, bool blocked) {
+    if(checkbox.radio) {
+        gui_circle_t circle = CIR(gui_pos_from_round_rect(checkbox.rect), checkbox.rect.width / 2, 1, false);
+        gui_draw_circle(circle, checkbox.outline);
+    } else {
+
+    }
+}
+
+/// @brief Draws a checkbox with text
+/// @param checkbox The checkbox to draw
+/// @param blocked Whether input is blocked (Overrides states)
+static void gui_draw_checkbox_text(gui_text_checkbox_t checkbox, bool blocked) {
+    if(checkbox.text_pos == 0) {
+        // Left
+    } else if(checkbox.text_pos == 1) {
+        // Right
+    }
 }
 
 /// @brief Draws a button
