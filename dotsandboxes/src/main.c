@@ -41,6 +41,10 @@ void game_start_game_options() {
     game_enter_mode(MODE_GAME_OPTIONS);
 }
 
+void game_start_play() {
+    game_enter_mode(MODE_PLAY);
+}
+
 void game_game_render_loop() {
     BeginDrawing();
     ClearBackground(gui_get_color("BACKGROUND"));

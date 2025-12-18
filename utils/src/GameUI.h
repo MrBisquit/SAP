@@ -129,6 +129,11 @@ static Color gui_get_color(const char* name) {
     return gui_get_color_theme(name, gui_theme);
 }
 
+enum {
+    GUI_EVENT_RESIZE,
+    GUI_EVENT_FOCUS_CHANGE
+};
+
 static void _gui_render_loop() {
     BeginDrawing();
     ClearBackground(BLACK);

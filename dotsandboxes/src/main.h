@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../utils/src/GameUI.h"
+#include "game/game.h"
 
 #define AI_NAME "SAP-GameAI-DotsAndBoxes-L3"
 
@@ -18,7 +19,8 @@ enum {
     MODE_GAME = 1,
     MODE_OPTIONS = 2,
     MODE_CREDITS = 3,
-    MODE_GAME_OPTIONS = 4
+    MODE_GAME_OPTIONS = 4,
+    MODE_PLAY = 5
 };
 static int current_mode = MODE_MENU;
 
@@ -27,6 +29,7 @@ void game_start_game();
 void game_start_options();
 void game_start_credits();
 void game_start_game_options();
+void game_start_play();
 
 void game_menu_render_loop();
 void game_menu_input_loop();
@@ -81,6 +84,12 @@ static mode_t modes[] = {
         .input_loop = game_game_options_input_loop,
         .init = game_game_options_init,
         .handle_resize = game_game_options_handle_resize
+    },
+    {
+        .render_loop = game_render_loop,
+        .input_loop = game_input_loop,
+        .init = game_init,
+        .handle_resize = game_handle_resize
     }
 };
 

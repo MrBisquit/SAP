@@ -1,6 +1,7 @@
 #include "main.h"
 #include "game_options.h"
 #include "../../utils/src/GameUI.h"
+#include "game/game.h"
 
 void game_game_options_render_loop() {
     BeginDrawing();
@@ -37,6 +38,18 @@ void game_game_options_input_loop() {
 
     if(gui_button_pressed(game_game_options_back_button, MOUSE_BUTTON_LEFT, cursor)) {
         game_start_menu();
+    }
+
+    if(gui_button_pressed(game_game_options_normal_4x4, MOUSE_BUTTON_LEFT, cursor)) {
+        game_start(BOARD_4X4);
+    }
+
+    if(gui_button_pressed(game_game_options_normal_5x4, MOUSE_BUTTON_LEFT, cursor)) {
+        game_start(BOARD_5X4);
+    }
+
+    if(gui_button_pressed(game_game_options_normal_6x5, MOUSE_BUTTON_LEFT, cursor)) {
+        game_start(BOARD_6X5);
     }
 }
 

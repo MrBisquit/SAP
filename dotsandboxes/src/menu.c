@@ -2,6 +2,10 @@
 #include "menu.h"
 #include "../../utils/src/GameUI.h"
 
+// Alpha
+float a = 1.0f;
+bool in = true;
+
 void game_menu_render_loop() {
     BeginDrawing();
     ClearBackground(gui_get_color("BACKGROUND"));
@@ -10,12 +14,26 @@ void game_menu_render_loop() {
 
     SetMouseCursor(MOUSE_CURSOR_ARROW);
 
+    if(a != 0.0f && in)
+        a -= 0.075f;
+
+    if(a != 1.0f && !in)
+        a += 0.075f;
+
+    if(a <= 0.0f && in)
+        a = 0.0f;
+
+    if(a >= 1.0f && !in)
+        a = 1.0f;
+
     gui_draw_textblock(game_menu_title);
     gui_draw_textblock(game_menu_subtitle);
-    gui_draw_button(game_menu_play_button, false);
-    gui_draw_button(game_menu_options_button, false);
-    gui_draw_button(game_menu_credits_button, false);
-    gui_draw_button(game_menu_exit_button, false);
+    gui_draw_button(game_menu_play_button, a != 0.0f && in);
+    gui_draw_button(game_menu_options_button, a != 0.0f && in);
+    gui_draw_button(game_menu_credits_button, a != 0.0f && in);
+    gui_draw_button(game_menu_exit_button, a != 0.0f && in);
+
+    DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), Fade(gui_get_color("BACKGROUND"), a));
 
     EndDrawing();
 }
@@ -33,6 +51,12 @@ void game_menu_input_loop() {
         game_menu_init();
     }
 
+    static bool has_exit = false;
+
+    if(a == 1.0f) {
+        if(has_exit) exit(0);
+    }
+
     if(gui_button_pressed(game_menu_play_button, MOUSE_BUTTON_LEFT, cursor)) {
         game_start_game();
     }
@@ -46,11 +70,16 @@ void game_menu_input_loop() {
     }
 
     if(gui_button_pressed(game_menu_exit_button, MOUSE_BUTTON_LEFT, cursor)) {
-        exit(0);
+        in = false;
+        has_exit = true;
+        //exit(0);
     }
 }
 
 void game_menu_init() {
+    //in = true;
+    //a = 1.0f;
+
     int x_offset = 0;
     int y_offset = 0;
 
