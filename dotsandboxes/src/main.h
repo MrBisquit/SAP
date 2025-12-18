@@ -4,6 +4,8 @@
 
 #define AI_NAME "SAP-GameAI-DotsAndBoxes-L3"
 
+extern bool show_fps;
+
 typedef struct mode {
     void (*render_loop)();
     void (*input_loop)();

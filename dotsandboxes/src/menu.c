@@ -6,7 +6,7 @@ void game_menu_render_loop() {
     BeginDrawing();
     ClearBackground(gui_get_color("BACKGROUND"));
 
-    DrawFPS(GetRenderWidth() - 100, 10);
+    if(show_fps) DrawFPS(GetRenderWidth() - 100, 10);
 
     SetMouseCursor(MOUSE_CURSOR_ARROW);
 
@@ -15,6 +15,7 @@ void game_menu_render_loop() {
     gui_draw_button(game_menu_play_button, false);
     gui_draw_button(game_menu_options_button, false);
     gui_draw_button(game_menu_credits_button, false);
+    gui_draw_button(game_menu_exit_button, false);
 
     EndDrawing();
 }
@@ -42,6 +43,10 @@ void game_menu_input_loop() {
 
     if(gui_button_pressed(game_menu_credits_button, MOUSE_BUTTON_LEFT, cursor)) {
         game_start_credits();
+    }
+
+    if(gui_button_pressed(game_menu_exit_button, MOUSE_BUTTON_LEFT, cursor)) {
+        exit(0);
     }
 }
 
@@ -90,6 +95,14 @@ void game_menu_init() {
         40,
         0.5
     }, TXT("Credits & About", 25));
+
+    game_menu_exit_button = BTN((RoundRectangle){
+        35 + x_offset,
+        GetRenderHeight() - y_offset - (35 * 2),
+        50 * 14,
+        40,
+        0.5
+    }, TXT("Quit", 25));
 }
 
 void game_menu_handle_resize(Rectangle old, Rectangle current) {

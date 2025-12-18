@@ -6,7 +6,7 @@ void game_credits_render_loop() {
     BeginDrawing();
     ClearBackground(gui_get_color("BACKGROUND"));
 
-    DrawFPS(GetRenderWidth() - 100, 10);
+    if(show_fps) DrawFPS(GetRenderWidth() - 100, 10);
 
     SetMouseCursor(MOUSE_CURSOR_ARROW);
 
@@ -71,7 +71,7 @@ void game_credits_init() {
 
     game_credits_back_button = BTN((RoundRectangle){
         35 + x_offset,
-        35 + 50 + 10 + (15 * 10) + (7 * 15) + 125 + y_offset,
+        GetRenderHeight() - y_offset - (35 * 2),
         50 * 14,
         40,
         0.5

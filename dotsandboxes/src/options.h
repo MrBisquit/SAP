@@ -9,4 +9,12 @@ static gui_button_t game_options_dark_theme_button;
 static gui_textblock_t game_options_dark_theme_textblock;
 static gui_checkbox_t game_options_dark_theme_checkbox;
 
+static gui_button_t game_options_light_theme_button;
+static gui_textblock_t game_options_light_theme_textblock;
+static gui_checkbox_t game_options_light_theme_checkbox;
+
+static gui_button_t game_options_fps_button;
+static gui_textblock_t game_options_fps_textblock;
+static gui_checkbox_t game_options_fps_checkbox;
+
 static gui_button_t game_options_back_button;

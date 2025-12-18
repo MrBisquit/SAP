@@ -441,6 +441,20 @@ static RoundRectangle gui_rect_to_round(Rectangle rect) {
     return _rect;
 }
 
+/// @brief Normalises a circle
+/// @details This takes a circle and changes its position to be center-based if it is not already
+/// @param circle The circle to normalise
+/// @return The normalised circle
+static gui_circle_t gui_normalise_circle(gui_circle_t circle) {
+    if(circle.pos_mode == 1) {
+        circle.pos_mode = 0;
+        circle.x += circle.size;
+        circle.y += circle.size;
+    }
+
+    return circle;
+}
+
 /// @brief Checks if a button is being pressed
 /// @param button The button object
 /// @param mouse_button The mouse button to detect
@@ -580,7 +594,14 @@ static void gui_draw_circle(gui_circle_t circle, Color color) {
 static void gui_draw_checkbox(gui_checkbox_t checkbox, bool blocked) {
     if(checkbox.radio) {
         gui_circle_t circle = CIR(gui_pos_from_round_rect(checkbox.rect), checkbox.rect.width / 2, 1, false);
-        gui_draw_circle(circle, checkbox.outline);
+        gui_circle_t outside = gui_normalise_circle(circle);
+        gui_draw_circle(outside, checkbox.outline);
+
+        if(checkbox.checked) {
+            gui_circle_t inside = gui_normalise_circle(circle);
+            inside.size -= 4;
+            gui_draw_circle_fill(inside, checkbox.inside);
+        }
     } else {
         gui_draw_rectangle_round_outline(checkbox.rect, checkbox.outline);
         if(checkbox.checked) {

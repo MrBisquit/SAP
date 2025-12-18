@@ -6,7 +6,7 @@ void game_game_options_render_loop() {
     BeginDrawing();
     ClearBackground(gui_get_color("BACKGROUND"));
 
-    DrawFPS(GetRenderWidth() - 100, 10);
+    if(show_fps) DrawFPS(GetRenderWidth() - 100, 10);
 
     SetMouseCursor(MOUSE_CURSOR_ARROW);
 
