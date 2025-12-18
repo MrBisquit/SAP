@@ -82,7 +82,6 @@ void game_menu_init() {
         40,
         0.5
     }, TXT("Options", 25));
-    game_menu_options_button.enabled = false;
 
     game_menu_credits_button = BTN((RoundRectangle){
         35 + x_offset,

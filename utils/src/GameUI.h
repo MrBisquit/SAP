@@ -218,6 +218,7 @@ typedef struct gui_checkbox {
     RoundRectangle rect;
     bool radio;
     bool enabled;
+    bool checked;
 
     Color outline;
     Color inside;
@@ -238,6 +239,7 @@ typedef struct gui_text_checkbox {
     RoundRectangle rect;
     bool radio;
     bool enabled;
+    bool checked;
 
     Color outline;
     Color inside;
@@ -282,7 +284,7 @@ static gui_textblock_t gui_generate_textblock(const char* text, int fontSize, Ve
 }
 
 static gui_checkbox_t gui_generate_checkbox(RoundRectangle rect, bool radio) {
-    gui_checkbox_t _checkbox = {
+    gui_checkbox_t checkbox = {
         rect,
         radio,
         true,
@@ -299,6 +301,8 @@ static gui_checkbox_t gui_generate_checkbox(RoundRectangle rect, bool radio) {
         gui_get_color("CHECKBOX_CLICKED"),
         gui_get_color("CHECKBOX_CLICKED")
     };
+
+    return checkbox;
 }
 
 /// @brief Generates a button with the default colors
@@ -337,6 +341,7 @@ static gui_circle_t gui_generate_circle(Vector2 point, float size, int mode, boo
     return circle;
 }
 
+#define CHK gui_generate_checkbox
 #define BTN gui_generate_button
 #define TXT gui_generate_text
 #define TXB gui_generate_textblock
@@ -577,7 +582,22 @@ static void gui_draw_checkbox(gui_checkbox_t checkbox, bool blocked) {
         gui_circle_t circle = CIR(gui_pos_from_round_rect(checkbox.rect), checkbox.rect.width / 2, 1, false);
         gui_draw_circle(circle, checkbox.outline);
     } else {
+        gui_draw_rectangle_round_outline(checkbox.rect, checkbox.outline);
+        if(checkbox.checked) {
+            RoundRectangle inside = (RoundRectangle) {
+                checkbox.rect.x + 4,
+                checkbox.rect.y + 4,
+                checkbox.rect.width - 8,
+                checkbox.rect.height - 8,
 
+                //checkbox.rect.x + 2.5,
+                //checkbox.rect.y + 2.5,
+                //checkbox.rect.width - 4.5,
+                //checkbox.rect.height - 4.5,
+                checkbox.rect.rounded / 1.25
+            };
+            gui_draw_rectangle_round(inside, checkbox.inside);
+        }
     }
 }
 
