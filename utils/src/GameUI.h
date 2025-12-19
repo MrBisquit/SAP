@@ -293,6 +293,7 @@ static gui_checkbox_t gui_generate_checkbox(RoundRectangle rect, bool radio) {
         rect,
         radio,
         true,
+        false,
 
         gui_get_color("CHECKBOX"),
         gui_get_color("CHECKBOX"),

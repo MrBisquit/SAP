@@ -21,3 +21,7 @@ set(RAYLIB_VERBOSE OFF)
 file(GLOB SUBDIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
 include_directories(${SUBDIRS})
 add_subdirectory(dotsandboxes)
+
+add_subdirectory(sap)
+
+add_subdirectory(noughtsandcrosses)
