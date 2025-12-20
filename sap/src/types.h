@@ -20,7 +20,7 @@ typedef struct sap {
 } sap_t;
 
 typedef struct sap_err {
-    //bool success;
+    bool success;
     const char* error;
     uint64_t error_code;
 } sap_err_t;
@@ -33,8 +33,11 @@ typedef struct sap_init {
 
 /// @brief This struct is returned by sap_init
 typedef struct sap_final {
-    sap_t* sap_object;
     int return_code;
 
     sap_err_t error;
 } sap_final_t;
+
+typedef struct sap_font {
+    TTF_Font* font;
+} sap_font_t;

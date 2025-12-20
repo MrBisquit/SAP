@@ -11,10 +11,16 @@
 #ifndef SAP_NO_STD
     #include <stdint.h>
     #include <stdbool.h>
+    #include <stdio.h>
+#endif
+#ifndef SAP_NO_MEMORY
+    #include <memory.h>
+    #include <malloc.h>
 #endif
 
 #include "types.h"
 #include "error_table.h"
+#include "font/font.h"
 
 extern sap_t __sap_obj;
 
@@ -31,3 +37,7 @@ sap_init_t sap_begin_init();
 /// @warning Nothing after this will run unless the window exits
 /// @return A `sap_final_t` object
 sap_final_t sap_init(sap_init_t init);
+
+/// @brief Destroys the SAP instance
+/// @return A `sap_final_t` object
+sap_final_t sap_destroy();

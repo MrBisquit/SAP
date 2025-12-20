@@ -40,7 +40,6 @@ sap_init_t sap_begin_init() {
 
 sap_final_t sap_init(sap_init_t init) {
     sap_final_t final = {
-        &__sap_obj,
         0
     };
 
@@ -74,6 +73,17 @@ sap_final_t sap_init(sap_init_t init) {
         SDL_RenderPresent(renderer);
     }
 
+    sap_final_t _final = sap_destroy();
+
+end:
+    return final;
+}
+
+sap_final_t sap_destroy() {
+    sap_final_t final = {
+        0
+    };
+
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Break in poll loop (Likely caused by SDL_QUIT event)");
 
     SDL_DestroyRenderer(renderer);
@@ -81,8 +91,8 @@ sap_final_t sap_init(sap_init_t init) {
 
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Successfully destroyed window and renderer");
 
+    TTF_Quit();
     SDL_Quit();
 
-end:
     return final;
 }
