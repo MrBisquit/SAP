@@ -17,6 +17,11 @@
 
 extern sap_t __sap_obj;
 
+extern SDL_Window* window;
+extern SDL_Renderer* renderer;
+extern SDL_Surface* surface;
+extern SDL_Event event;
+
 /// @brief Begins the initialisation
 /// @return A `sap_init_t` object
 sap_init_t sap_begin_init();

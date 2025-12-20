@@ -2,11 +2,7 @@
 #include "stdio.h"
 
 int main(int argc, char* argv[]) {
-    printf("A");
-
     sap_init_t init = sap_begin_init();
-
-    printf("B");
     
     // Modify values
     //init.sap_object->resizable = true;
