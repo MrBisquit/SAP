@@ -28,6 +28,13 @@ sap_init_t sap_begin_init() {
         init.success = true;
     }
 
+    if(TTF_Init() < 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize TTF: %s", TTF_GetError());
+    } else {
+        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Initialized TTF successfully");
+        init.success = true;
+    }
+
     return init;
 }
 

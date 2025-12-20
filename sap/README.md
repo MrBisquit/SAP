@@ -11,3 +11,9 @@ for a better use of input blocking. There are 3 main layers to this in terms of 
 and input (separate for keyboard and mouse).
 
 This may either use Raylib, or SDL(2).
+
+## Fonts
+You can use my simple utility: [Bin2Array](https://github.com/MrBisquit/Bin2Array) to convert
+font files to header files. This utility does require .NET 8.0
+
+`bin2array -f font.ttf -t font.h -l cpp -w 8`

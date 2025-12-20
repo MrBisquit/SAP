@@ -6,6 +6,7 @@
 #endif
 #ifndef SAP_NO_SDL2
     #include <SDL.h>
+    #include <SDL2/SDL_ttf.h>
 #endif
 #ifndef SAP_NO_STD
     #include <stdint.h>
