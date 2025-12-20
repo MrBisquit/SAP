@@ -1,7 +1,7 @@
 #include "../../sap/src/sap.h"
 #include "stdio.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, const char* argv[]) {
     sap_init_t init = sap_begin_init();
     
     // Modify values

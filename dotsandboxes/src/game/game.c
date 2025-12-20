@@ -20,7 +20,7 @@ void game_render_loop() {
 }
 
 void game_input_loop() {
-    Vector2 cursor = GetMousePosition();
+    //Vector2 cursor = GetMousePosition();
 
     
 }
