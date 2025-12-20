@@ -20,7 +20,7 @@ typedef struct sap {
 } sap_t;
 
 typedef struct sap_err {
-    bool success;
+    //bool success;
     const char* error;
     uint64_t error_code;
 } sap_err_t;

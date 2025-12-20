@@ -11,7 +11,7 @@ sap_init_t sap_begin_init() {
     return init;
 }
 
-sap_final_t sap_init() {
+sap_final_t sap_init(sap_init_t init) {
     sap_final_t final = {
         &__sap_obj,
         0

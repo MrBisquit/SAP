@@ -2,10 +2,14 @@
 
 // Include headers
 #ifndef SAP_NO_RAYLIB
-    #include <raylib.h>
+    //#include <raylib.h>
 #endif
-#ifndef SAP_NO_STDINT
+#ifndef SAP_NO_SDL2
+    #include <SDL.h>
+#endif
+#ifndef SAP_NO_STD
     #include <stdint.h>
+    #include <stdbool.h>
 #endif
 
 #include "types.h"
@@ -20,4 +24,4 @@ sap_init_t sap_begin_init();
 /// @brief Finalises the initialisation and begins loops
 /// @warning Nothing after this will run unless the window exits
 /// @return A `sap_final_t` object
-sap_final_t sap_init();
+sap_final_t sap_init(sap_init_t init);
