@@ -9,7 +9,7 @@ These games will use Raylib, with a central UI library so that they are all cons
 | Noughts And Crosses | [NACBOT](/noughtsandcrosses/NACBOT.md)                                    | NACBOT    | [Noughts And Crosses](noughtsandcrosses/README.md) |
 
 Planned:
-- Add in previous games (nacbot, bsbot, etc)
+- Reimplement BSBOT (a previous project)
 
 ## Naming Scheme
 SAP algorithms must follow a naming scheme, there are 2 versions, the identifyable "Algorithm", and the code name (which can be like a cooler name for it).
