@@ -39,9 +39,30 @@ void game_render_loop();
 void game_input_loop();
 void game_init();
 void game_handle_resize(Rectangle old, Rectangle current);
+void game_update_data();
+
+void game_enter_dialog(int type);
+void game_render_loop_dialog();
+void game_input_loop_dialog();
+
+extern int player_score;
+extern int bot_score;
+extern int winner;
+extern int turn;
+
+extern char __p_score[3];
+extern char __b_score[3];
+
+extern int board_w;
+extern int board_h;
+
+extern int dialog_type;
+extern bool dialog_visible;
+extern bool dialog_cover_entire;
 
 // Bounds (Hold F2 to see)
 static Rectangle game_game_bounds;
+static Rectangle game_game_inner_bounds;
 static Rectangle game_info_bounds;
 
 // Top bar
@@ -51,3 +72,18 @@ static gui_button_t game_game_exit_button;
 // Side bar (Info)
 static RoundRectangle game_info_board;
 static gui_textblock_t game_info_board_title;
+static gui_textblock_t game_info_board_turn;
+static gui_textblock_t game_info_board_player_score;
+static gui_textblock_t game_info_board_bot_score;
+
+// Dialog structures
+typedef struct game_exit_dialog {
+    RoundRectangle rect;
+    gui_textblock_t title;
+    gui_textblock_t description;
+    gui_button_t yes;
+    gui_button_t no;
+} game_exit_dialog_t;
+
+// Dialogs
+static game_exit_dialog_t game_game_exit_dialog;
