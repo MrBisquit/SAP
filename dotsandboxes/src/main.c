@@ -2,7 +2,7 @@
 #include "../../utils/src/GameUI.h"
 
 THEME gui_theme = THEME_DARK;
-bool show_fps = true;
+bool show_fps = false;
 
 int main(int argc, char* argv[]) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);

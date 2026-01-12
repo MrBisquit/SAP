@@ -39,3 +39,15 @@ void game_render_loop();
 void game_input_loop();
 void game_init();
 void game_handle_resize(Rectangle old, Rectangle current);
+
+// Bounds (Hold F2 to see)
+static Rectangle game_game_bounds;
+static Rectangle game_info_bounds;
+
+// Top bar
+static gui_textblock_t game_game_title;
+static gui_button_t game_game_exit_button;
+
+// Side bar (Info)
+static RoundRectangle game_info_board;
+static gui_textblock_t game_info_board_title;

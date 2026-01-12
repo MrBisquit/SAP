@@ -35,11 +35,16 @@ typedef struct {
     Color dark;
 } ThemeColor;
 
-static const ThemeColor gui_theme_colors[12] = {
+static const ThemeColor gui_theme_colors[13] = {
     {
         "BACKGROUND",
         { .r = 227, .g = 227, .b = 227, .a = 255 }, // #E3E3E3 (0xE3E3E3)
         { .r = 23,  .g = 23,  .b = 23,  .a = 255 }  // #171717 (0x171717)
+    },
+    {
+        "SECONDARY",
+        { .r = 207, .g = 207, .b = 207, .a = 255 },
+        { .r = 43,  .g = 43,  .b = 43,  .a = 255 }
     },
     {
         "TEXT",
