@@ -60,6 +60,8 @@ extern int dialog_type;
 extern bool dialog_visible;
 extern bool dialog_cover_entire;
 
+extern bool game_disable_header_buttons;
+
 // Bounds (Hold F2 to see)
 static Rectangle game_game_bounds;
 static Rectangle game_game_inner_bounds;
@@ -67,6 +69,7 @@ static Rectangle game_info_bounds;
 
 // Top bar
 static gui_textblock_t game_game_title;
+static gui_button_t game_game_reset_button;
 static gui_button_t game_game_exit_button;
 
 // Side bar (Info)
@@ -85,5 +88,23 @@ typedef struct game_exit_dialog {
     gui_button_t no;
 } game_exit_dialog_t;
 
+typedef struct game_reset_dialog {
+    RoundRectangle rect;
+    gui_textblock_t title;
+    gui_textblock_t description;
+    gui_button_t yes;
+    gui_button_t no;
+} game_reset_dialog_t;
+
+typedef struct game_start_dialog {
+    RoundRectangle rect;
+    gui_textblock_t title;
+    gui_textblock_t description;
+    gui_button_t start;
+    gui_button_t cancel;
+} game_start_dialog_t;
+
 // Dialogs
 static game_exit_dialog_t game_game_exit_dialog;
+static game_reset_dialog_t game_game_reset_dialog;
+static game_start_dialog_t game_game_start_dialog;

@@ -20,9 +20,12 @@ int dialog_type = -1;
 bool dialog_visible = false;
 bool dialog_cover_entire = false;
 
+bool game_disable_header_buttons = false;
+
 void game_start(int size) {
     board_size = size;
     game_start_play();
+    game_enter_dialog(2);
 }
 
 void game_render_loop() {
@@ -35,6 +38,7 @@ void game_render_loop() {
 
     DrawRectangle(0, 0, GetRenderWidth(), 60, gui_get_color("SECONDARY"));
     gui_draw_textblock(game_game_title);
+    gui_draw_button(game_game_reset_button, dialog_visible);
     gui_draw_button(game_game_exit_button, dialog_visible);
 
     if(board_size == -1) {
@@ -147,6 +151,10 @@ void game_input_loop() {
         //game_start_menu();
         game_enter_dialog(0);
     }
+
+    if(gui_button_pressed(game_game_reset_button, MOUSE_BUTTON_LEFT, cursor)) {
+        game_enter_dialog(1);
+    }
 }
 
 void game_init() {
@@ -196,6 +204,16 @@ void game_init() {
         20
     });
 
+    game_game_reset_button = BTN((RoundRectangle){
+        // X Y Width Height Rounded
+        GetRenderWidth() - 100 - 15 - 150 - 5,
+        15,
+        150,
+        30,
+        0.5
+    }, TXT("Reset game", 20));
+    game_game_reset_button.enabled = !game_disable_header_buttons;
+
     game_game_exit_button = BTN((RoundRectangle){
         // X Y Width Height Rounded
         GetRenderWidth() - 100 - 15,
@@ -204,6 +222,7 @@ void game_init() {
         30,
         0.5
     }, TXT("Exit", 20));
+    game_game_exit_button.enabled = !game_disable_header_buttons;
 
     game_info_board = gui_rect_to_round(game_info_bounds);
     game_info_board.rounded = 0.05;
@@ -233,6 +252,7 @@ void game_init() {
 
 void game_handle_resize(Rectangle old, Rectangle current) {
     game_init();
+    game_enter_dialog(dialog_type);
 }
 
 void game_update_data() {
@@ -253,6 +273,7 @@ void game_enter_dialog(int type) {
     if(type == 0) {
         dialog_visible = true;
         dialog_cover_entire = true;
+        game_disable_header_buttons = false;
 
         int w = 400;
         int h = 200;
@@ -295,7 +316,102 @@ void game_enter_dialog(int type) {
             30,
             0.5
         }, TXT("No", 20));
+    } else if(type == 1) {
+        dialog_visible = true;
+        dialog_cover_entire = true;
+        game_disable_header_buttons = false;
+
+        int w = 400;
+        int h = 200;
+
+        game_game_reset_dialog.rect = (RoundRectangle) {
+            (GetRenderWidth() / 2) - (w / 2),
+            (GetRenderHeight() / 2) - (h / 2),
+            w,
+            h,
+            0.125
+        };
+
+        game_game_reset_dialog.title = TXB("Are you sure?", 25, (Vector2){
+            game_game_reset_dialog.rect.x + 25,
+            game_game_reset_dialog.rect.y + 25
+        });
+
+        game_game_reset_dialog.description = TXB(
+            "This will reset the current game and lose any\ncurrent scores.",
+            15, (Vector2){
+                game_game_reset_dialog.rect.x + 25,
+                game_game_reset_dialog.rect.y + 25 + 25 + 10
+            }
+        );
+
+        game_game_reset_dialog.yes = BTN((RoundRectangle){
+            // X Y Width Height Rounded
+            game_game_reset_dialog.rect.x + game_game_reset_dialog.rect.width - (100 * 2) - (15 * 2) + 5,
+            game_game_reset_dialog.rect.y + game_game_reset_dialog.rect.height - 30 - 15,
+            100,
+            30,
+            0.5
+        }, TXT("Yes", 20));
+
+        game_game_reset_dialog.no = BTN((RoundRectangle){
+            // X Y Width Height Rounded
+            game_game_reset_dialog.rect.x + game_game_reset_dialog.rect.width - 100 - 15,
+            game_game_reset_dialog.rect.y + game_game_reset_dialog.rect.height - 30 - 15,
+            100,
+            30,
+            0.5
+        }, TXT("No", 20));
+    } else if(type == 2) {
+        dialog_visible = true;
+        dialog_cover_entire = false;
+        game_disable_header_buttons = true;
+
+        int w = 400;
+        int h = 200;
+
+        /// @todo Adjust the Y position to get it centered vertically
+        game_game_start_dialog.rect = (RoundRectangle) {
+            (GetRenderWidth() / 2) - (w / 2),
+            (GetRenderHeight() / 2) - (h / 2) - (60 / 4),
+            w,
+            h,
+            0.125
+        };
+
+        game_game_start_dialog.title = TXB("Dots And Boxes", 25, (Vector2){
+            game_game_start_dialog.rect.x + 25,
+            game_game_start_dialog.rect.y + 25
+        });
+
+        game_game_start_dialog.description = TXB(
+            "Press start when you are ready to start the\ngame.",
+            15, (Vector2){
+                game_game_start_dialog.rect.x + 25,
+                game_game_start_dialog.rect.y + 25 + 25 + 10
+            }
+        );
+
+        game_game_start_dialog.start = BTN((RoundRectangle){
+            // X Y Width Height Rounded
+            game_game_start_dialog.rect.x + game_game_start_dialog.rect.width - (100 * 2) - (15 * 2) + 5,
+            game_game_start_dialog.rect.y + game_game_start_dialog.rect.height - 30 - 15,
+            100,
+            30,
+            0.5
+        }, TXT("Start", 20));
+
+        game_game_start_dialog.cancel = BTN((RoundRectangle){
+            // X Y Width Height Rounded
+            game_game_start_dialog.rect.x + game_game_start_dialog.rect.width - 100 - 15,
+            game_game_start_dialog.rect.y + game_game_start_dialog.rect.height - 30 - 15,
+            100,
+            30,
+            0.5
+        }, TXT("Cancel", 20));
     }
+
+    game_init();
 }
 
 void game_render_loop_dialog() {
@@ -305,6 +421,18 @@ void game_render_loop_dialog() {
         gui_draw_textblock(game_game_exit_dialog.description);
         gui_draw_button(game_game_exit_dialog.yes, false);
         gui_draw_button(game_game_exit_dialog.no, false);
+    } else if(dialog_type == 1) {
+        gui_draw_rectangle_round(game_game_reset_dialog.rect, gui_get_color("POPUP_BACKGROUND"));
+        gui_draw_textblock(game_game_reset_dialog.title);
+        gui_draw_textblock(game_game_reset_dialog.description);
+        gui_draw_button(game_game_reset_dialog.yes, false);
+        gui_draw_button(game_game_reset_dialog.no, false);
+    } else if(dialog_type == 2) {
+        gui_draw_rectangle_round(game_game_start_dialog.rect, gui_get_color("POPUP_BACKGROUND"));
+        gui_draw_textblock(game_game_start_dialog.title);
+        gui_draw_textblock(game_game_start_dialog.description);
+        gui_draw_button(game_game_start_dialog.start, false);
+        gui_draw_button(game_game_start_dialog.cancel, false);
     }
 }
 
@@ -318,6 +446,26 @@ void game_input_loop_dialog() {
 
         if(gui_button_pressed(game_game_exit_dialog.no, MOUSE_BUTTON_LEFT, cursor)) {
             game_enter_dialog(-1);
+        }
+    } else if(dialog_type == 1) {
+        if(gui_button_pressed(game_game_reset_dialog.yes, MOUSE_BUTTON_LEFT, cursor)) {
+            /// @todo Add game resetting functionality
+
+            game_enter_dialog(-1);
+        }
+
+        if(gui_button_pressed(game_game_reset_dialog.no, MOUSE_BUTTON_LEFT, cursor)) {
+            game_enter_dialog(-1);
+        }
+    } else if(dialog_type == 2) {
+        if(gui_button_pressed(game_game_start_dialog.start, MOUSE_BUTTON_LEFT, cursor)) {
+            /// @todo Add game starting functionality
+
+            game_enter_dialog(-1);
+        }
+
+        if(gui_button_pressed(game_game_start_dialog.cancel, MOUSE_BUTTON_LEFT, cursor)) {
+            game_start_menu();
         }
     }
 }
