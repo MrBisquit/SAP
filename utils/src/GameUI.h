@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 // Window properties
 #define WINDOW_DEFAULT_WIDTH    800 * 2
@@ -419,7 +420,29 @@ static bool gui_circle_overlap(gui_circle_t a, gui_circle_t b) {
 /// @param circle The circle
 /// @return `true` if the point is inside the circle, `false` if not
 static bool gui_point_in_circle(Vector2 point, gui_circle_t circle) {
-    // TODO: Functionality foe gui_point_in_circle
+    /*
+        Let the center of the circle be (h, k) and the radius be r.
+        Use the distance formula: d = √((x - h)² + (y - k)²).
+
+        Compare the distance d to the radius r:
+        If d < r, the point lies inside the circle.
+        If d = r, the point lies on the circle.
+        If d > r, the point lies outside the circle.
+    */
+
+    gui_circle_t c = gui_normalise_circle(circle);
+
+    int h = c.x;
+    int k = c.y;
+    int x = point.x;
+    int y = point.y;
+
+    int d = sqrt(((x - h) ^ 2) + ((y - k) ^ 2));
+
+    if(d <= c.size)
+        return true;
+    else
+        return false;
 }
 
 /// @brief Converts a `RoundRectangle` to a `Rectangle`

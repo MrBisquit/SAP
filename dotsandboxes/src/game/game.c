@@ -31,11 +31,25 @@ void game_start(int size) {
     board_size = size;
     game_start_play();
     game_enter_dialog(2);
+
+    if(size == 0) {
+        board_w = 250;
+        board_h = 250;
+    } else if(size == 1) {
+        board_w = 350;
+        board_h = 350;
+    } else if(size == 2) {
+        board_w = 450;
+        board_h = 450;
+    }
 }
 
 void game_generate_board(int size) {
     int dots_w = 0;
     int dots_h = 0;
+
+    int boxes_w = 0;
+    int boxes_h = 0;
 
     if(size == 0) {
         dots_w = 4;
@@ -47,6 +61,9 @@ void game_generate_board(int size) {
         dots_w = 6;
         dots_h = 5;
     }
+
+    boxes_w = dots_w - 1;
+    boxes_h = dots_h - 1;
 
     board.dots = malloc(sizeof(game_board_dot_t*) * dots_h);
 
@@ -138,13 +155,22 @@ void game_render_loop() {
 
         for(int y = 0; y < dots_y; y++) {
             for(int x = 0; x < dots_x; x++) {
-                DrawRectangle(
-                    game_game_inner_bounds.x + (each_w * x) + dots_offset_x,
-                    game_game_inner_bounds.y + (each_h * y) + dots_offset_y,
-                    10,
-                    10,
-                    GREEN
-                );
+                Color c;
+
+                if(board.dots[y][x].owned == -1) {
+                    c = gui_get_color("BUTTON"); // Just because it's a bright colour
+                } else if(board.dots[y][x].owned == 0) {
+                    c = BLUE;
+                } else {
+                    c = RED;
+                }
+
+                int _x = game_game_inner_bounds.x + (each_w * x) + dots_offset_x;
+                int _y = game_game_inner_bounds.y + (each_h * y) + dots_offset_y;
+                int _w = 10;
+                int _h = 10;
+
+                DrawCircle(_x + (_w / 2), _y + (_h / 2), 10, c);
             }
         }
     }

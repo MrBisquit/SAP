@@ -53,6 +53,8 @@ void game_enter_dialog(int type);
 void game_render_loop_dialog();
 void game_input_loop_dialog();
 
+void game_board_render(game_board_t* board, Rectangle bounds);
+
 extern int player_score;
 extern int bot_score;
 extern int winner;
