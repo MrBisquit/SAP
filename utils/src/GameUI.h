@@ -6,19 +6,19 @@
 #include <math.h>
 
 // Window properties
-#define WINDOW_DEFAULT_WIDTH    800 * 2
-#define WINDOW_DEFAULT_HEIGHT   450 * 2
-#define WINDOW_TARGET_FPS       60
+#define WINDOW_DEFAULT_WIDTH    (800 * 2)
+#define WINDOW_DEFAULT_HEIGHT   (450 * 2)
+#define WINDOW_TARGET_FPS       (60)
 
 // Font sizes
-#define FONT_TITLE              25
-#define FONT_SUBTITLE           20
-#define FONT_NORMAL             15
-#define FONT_SMALL              10
+#define FONT_TITLE              (25)
+#define FONT_SUBTITLE           (20)
+#define FONT_NORMAL             (15)
+#define FONT_SMALL              (10)
 
 // Rounding
-#define ROUNDING_DEFAULT        0.5f
-#define ROUNDING_POPUP          0.05f
+#define ROUNDING_DEFAULT        (0.5f)
+#define ROUNDING_POPUP          (0.05f)
 
 #define COLORS_BACKGROUND_LIGHT { .r = 227, .g = 227, .b = 227, .a = 255 }
 #define COLORS_BACKGROUND_DARK  { .r = 23,  .g = 23,  .b = 23,  .a = 255 }

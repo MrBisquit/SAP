@@ -3,6 +3,7 @@
 #include "game.h"
 #include "../../../utils/src/GameUI.h"
 
+// Tons of global values because it's just easiser
 static int board_size = -1;
 
 int player_score = 0;
@@ -10,8 +11,8 @@ int bot_score = 0;
 int winner = -1;
 int turn = 0;
 
-extern char __p_score[3] = "000";
-extern char __b_score[3] = "000";
+char __p_score[3] = "000";
+char __b_score[3] = "000";
 
 int board_w = 200;
 int board_h = 200;
@@ -34,20 +35,21 @@ bool game_disable_header_buttons = false;
 game_board_t board;
 
 bool dot_dragging = false;
-game_board_dot_t* first_dot;
+game_board_dot_t* first_dot = NULL;
 
 void game_start(int size) {
     board_size = size;
     game_start_play();
     game_enter_dialog(2);
 
-    if(size == 0) {
+    // Set the board sizes
+    if(size == BOARD_4X4) {
         board_w = 250;
         board_h = 250;
-    } else if(size == 1) {
+    } else if(size == BOARD_5X4) {
         board_w = 350;
         board_h = 350;
-    } else if(size == 2) {
+    } else if(size == BOARD_6X5) {
         board_w = 450;
         board_h = 450;
     }
@@ -60,13 +62,14 @@ void game_generate_board(int size) {
     int boxes_w = 0;
     int boxes_h = 0;
 
-    if(size == 0) {
+    // These are for setting the board width and height in points
+    if(size == BOARD_4X4) {
         dots_w = 4;
         dots_h = 4;
-    } else if(size == 1) {
+    } else if(size == BOARD_5X4) {
         dots_w = 5;
         dots_h = 4;
-    } else if(size == 2) {
+    } else if(size == BOARD_6X5) {
         dots_w = 6;
         dots_h = 5;
     }
