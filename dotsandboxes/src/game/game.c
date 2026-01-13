@@ -19,6 +19,12 @@ int board_h = 200;
 int dots_x = 0;
 int dots_y = 0;
 
+int boxes_x = 0;
+int boxes_y = 0;
+
+int lines_x = 0;
+int lines_y = 0;
+
 int dialog_type = -1;
 bool dialog_visible = false;
 bool dialog_cover_entire = false;
@@ -26,6 +32,9 @@ bool dialog_cover_entire = false;
 bool game_disable_header_buttons = false;
 
 game_board_t board;
+
+bool dot_dragging = false;
+game_board_dot_t* first_dot;
 
 void game_start(int size) {
     board_size = size;
@@ -76,9 +85,72 @@ void game_generate_board(int size) {
         }
     }
 
+    board.boxes = malloc(sizeof(game_board_box_t*) * boxes_h);
+
+    /*
+        This needs to be calculated so that we have the correct amount of lines:
+        - Per row, same amount as boxes
+        - Per col, same amount as boxes
+    */
+
+    int _lines_per_row = boxes_w;
+    int _lines_per_col = boxes_h;
+    int _lines_rows = boxes_h;
+    int _lines_cols = boxes_w;
+    int _lines_rows_total = _lines_per_row * _lines_rows;
+    int _lines_cols_total = _lines_per_col * _lines_cols;
+    int lines_total = _lines_rows_total + _lines_cols_total;
+
+    printf("%d", lines_total);
+
+    //board.lines = malloc(sizeof(game_board_line_t*) * lines_w);
+
+    for(int y = 0; y < boxes_h; y++) {
+        board.boxes[y] = malloc(sizeof(game_board_box_t) * boxes_w);
+        for(int x = 0; x < boxes_w; x++) {
+            board.boxes[y][x] = (game_board_box_t){
+                {
+                    &board.dots[y][x],
+                    &board.dots[y + 1][x],
+                    &board.dots[y + 1][x + 1],
+                    &board.dots[y][x + 1]
+                },
+                {
+                    /*{
+                        &board.dots[y][x],
+                        &board.dots[y + 1][x],
+                        -1
+                    },
+                    {
+                        &board.dots[y + 1][x],
+                        &board.dots[y + 1][x + 1],
+                        -1
+                    },
+                    {
+                        &board.dots[y + 1][x + 1],
+                        &board.dots[y][x + 1],
+                        -1
+                    }, {
+                        &board.dots[y][x + 1],
+                        &board.dots[y][x],
+                        -1
+                    }*/
+
+                    {
+                        // Fill in
+                    }
+                },
+                x, y, -1
+            };
+        }
+    }
+
     board.total_dots = dots_w * dots_h;
+    board.total_boxes = (dots_w - 1) * (dots_h - 1);
     dots_x = dots_w;
     dots_y = dots_h;
+    boxes_y = boxes_w;
+    boxes_x = boxes_h;
 }
 
 void game_render_loop() {
@@ -147,32 +219,7 @@ void game_render_loop() {
     );
 
     if(board.total_dots > 0) {
-        int each_w = board_w / dots_x;
-        int each_h = board_h / dots_y;
-
-        int dots_offset_x = 20;
-        int dots_offset_y = 20;
-
-        for(int y = 0; y < dots_y; y++) {
-            for(int x = 0; x < dots_x; x++) {
-                Color c;
-
-                if(board.dots[y][x].owned == -1) {
-                    c = gui_get_color("BUTTON"); // Just because it's a bright colour
-                } else if(board.dots[y][x].owned == 0) {
-                    c = BLUE;
-                } else {
-                    c = RED;
-                }
-
-                int _x = game_game_inner_bounds.x + (each_w * x) + dots_offset_x;
-                int _y = game_game_inner_bounds.y + (each_h * y) + dots_offset_y;
-                int _w = 10;
-                int _h = 10;
-
-                DrawCircle(_x + (_w / 2), _y + (_h / 2), 10, c);
-            }
-        }
+        game_board_render(&board, game_game_inner_bounds);
     }
 
     if(dialog_visible) {
@@ -574,6 +621,136 @@ void game_input_loop_dialog() {
 
         if(gui_button_pressed(game_game_start_dialog.cancel, MOUSE_BUTTON_LEFT, cursor)) {
             game_start_menu();
+        }
+    }
+}
+
+void game_board_render(game_board_t* board, Rectangle bounds) {
+    Vector2 cursor = GetMousePosition();
+
+    int each_w = board_w / dots_x;
+    int each_h = board_h / dots_y;
+
+    int dots_offset_x = 20;
+    int dots_offset_y = 20;
+
+    board->boxes[0][0].owned = 1;
+    board->boxes[0][0].lines[0].owned = 1;
+    board->boxes[0][0].lines[1].owned = 1;
+    board->boxes[0][0].lines[2].owned = 1;
+    board->boxes[0][0].lines[3].owned = 1;
+    board->boxes[0][1].owned = 0;
+
+    for(int y = 0; y < boxes_y; y++) {
+        for(int x = 0; x < boxes_x; x++) {
+            Color c;
+
+            if(board->boxes[y][x].owned == -1) {
+                c.a = 0;
+            } else if(board->boxes[y][x].owned == 0) {
+                c = BLUE;
+                c.a /= 2;
+            } else {
+                c = RED;
+                c.a /= 2;
+            }
+
+            int _x = bounds.x + (each_w * x) + dots_offset_x;
+            int _y = bounds.y + (each_h * y) + dots_offset_y;
+            int _w = each_w;
+            int _h = each_h;
+
+            DrawRectangle(_x, _y, _w, _h, c);
+
+            for(int i = 0; i < 4; i++) {
+                Color _c;
+
+                int _fx = board->boxes[y][x].lines[i].from->circle.x;
+                int _fy = board->boxes[y][x].lines[i].from->circle.y;
+                int _tx = board->boxes[y][x].lines[i].to->circle.x;
+                int _ty = board->boxes[y][x].lines[i].to->circle.y;
+
+                if(board->boxes[y][x].lines[i].owned == -1) {
+                    _c = gui_get_color("BUTTON");
+                    _c.a = 255;
+                    _c.r /= 2;
+                    _c.g /= 2;
+                    _c.b /= 2;
+                } else if(board->boxes[y][x].lines[i].owned == 0) {
+                    _c = BLUE;
+                } else {
+                    _c = RED;
+                }
+
+                DrawLineEx(
+                    (Vector2) { _fx, _fy },
+                    (Vector2) { _tx, _ty },
+                    7.5,
+                    _c
+                );
+            }
+        }
+    }
+
+    for(int y = 0; y < dots_y; y++) {
+        for(int x = 0; x < dots_x; x++) {
+            Color c;
+
+            if(board->dots[y][x].owned == -1) {
+                c = gui_get_color("BUTTON"); // Just because it's a bright colour
+            } else if(board->dots[y][x].owned == 0) {
+                c = BLUE;
+            } else {
+                c = RED;
+            }
+
+            int _x = bounds.x + (each_w * x) + dots_offset_x;
+            int _y = bounds.y + (each_h * y) + dots_offset_y;
+            int _w = 10;
+            int _h = 10;
+
+            //DrawCircle(_x + (_w / 2), _y + (_h / 2), 10, c);
+
+            board->dots[y][x].circle = CIR((Vector2){ _x, _y}, 10, 0, true);
+
+            if(gui_point_in_circle(cursor, board->dots[y][x].circle) &&
+                !dialog_visible &&
+                board->dots[y][x].owned == -1) {
+                c.r *= 2;
+                c.g *= 2;
+                c.b *= 2;
+                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+            }
+
+            if(gui_point_in_circle(cursor, board->dots[y][x].circle) &&
+                !dialog_visible &&
+                board->dots[y][x].owned == -1 &&
+                IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+                if(dot_dragging) {
+                    c.r *= 2;
+                    c.g *= 2;
+                    c.b *= 2;
+                    SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+                } else {
+                    dot_dragging = true;
+                    first_dot = &board->dots[y][x];
+                }
+            }
+
+            if(IsMouseButtonUp(MOUSE_BUTTON_LEFT) && dot_dragging)
+                dot_dragging = false;
+
+            if(dot_dragging) {
+                DrawLineEx(
+                    (Vector2){ first_dot->circle.x, first_dot->circle.y },
+                    cursor,
+                    5,
+                    BLUE
+                );
+            }
+
+            c.a = 255;
+            gui_draw_circle(board->dots[y][x].circle, c);
         }
     }
 }

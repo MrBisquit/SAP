@@ -430,14 +430,21 @@ static bool gui_point_in_circle(Vector2 point, gui_circle_t circle) {
         If d > r, the point lies outside the circle.
     */
 
-    gui_circle_t c = gui_normalise_circle(circle);
+    //gui_circle_t c = gui_normalise_circle(circle);
+    gui_circle_t c = circle;
+    if(c.pos_mode == 1) {
+        c.pos_mode = 0;
+        c.x += c.size;
+        c.y += c.size;
+    }
 
-    int h = c.x;
-    int k = c.y;
-    int x = point.x;
-    int y = point.y;
+    float h = c.x;
+    float k = c.y;
+    float x = point.x;
+    float y = point.y;
 
-    int d = sqrt(((x - h) ^ 2) + ((y - k) ^ 2));
+    float _d = powf(x - h, 2.0f) + powf(y - k, 2.0f);
+    float d = sqrtf(_d);
 
     if(d <= c.size)
         return true;

@@ -13,28 +13,35 @@ typedef struct game_board_dot {
     int x;
     int y;
     int owned;
+
+    gui_circle_t circle;
 } game_board_dot_t;
 
 typedef struct game_board_line {
-    Vector2 from;
-    Vector2 to;
-    int value;
+    game_board_dot_t* from;
+    game_board_dot_t* to;
+
+    int owned;
 } game_board_line_t;
 
 typedef struct game_board_box {
     game_board_dot_t* dots[4];
-    game_board_line_t lines[4];
+    game_board_line_t* lines[4];
 
     int x;
     int y;
+
+    int owned;
 } game_board_box_t;
 
 typedef struct game_board {
     game_board_box_t** boxes;
     game_board_dot_t** dots;
+    game_board_line_t** lines;
 
     int total_boxes;
     int total_dots;
+    int total_lines;
 } game_board_t;
 
 /// @brief Start the game with a specific board size
@@ -69,6 +76,12 @@ extern int board_h;
 extern int dots_x;
 extern int dots_y;
 
+extern int boxes_x;
+extern int boxes_y;
+
+extern int lines_x;
+extern int lines_y;
+
 extern int dialog_type;
 extern bool dialog_visible;
 extern bool dialog_cover_entire;
@@ -76,6 +89,9 @@ extern bool dialog_cover_entire;
 extern bool game_disable_header_buttons;
 
 extern game_board_t board;
+
+extern bool dot_dragging;
+extern game_board_dot_t* first_dot;
 
 // Bounds (Hold F2 to see)
 static Rectangle game_game_bounds;
