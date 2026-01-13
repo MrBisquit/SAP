@@ -16,16 +16,52 @@ extern char __b_score[3] = "000";
 int board_w = 200;
 int board_h = 200;
 
+int dots_x = 0;
+int dots_y = 0;
+
 int dialog_type = -1;
 bool dialog_visible = false;
 bool dialog_cover_entire = false;
 
 bool game_disable_header_buttons = false;
 
+game_board_t board;
+
 void game_start(int size) {
     board_size = size;
     game_start_play();
     game_enter_dialog(2);
+}
+
+void game_generate_board(int size) {
+    int dots_w = 0;
+    int dots_h = 0;
+
+    if(size == 0) {
+        dots_w = 4;
+        dots_h = 4;
+    } else if(size == 1) {
+        dots_w = 5;
+        dots_h = 4;
+    } else if(size == 2) {
+        dots_w = 6;
+        dots_h = 5;
+    }
+
+    board.dots = malloc(sizeof(game_board_dot_t*) * dots_h);
+
+    for(int y = 0; y < dots_h; y++) {
+        board.dots[y] = malloc(sizeof(game_board_dot_t) * dots_w);
+        for(int x = 0; x < dots_w; x++) {
+            board.dots[y][x] = (game_board_dot_t){
+                x, y, -1
+            };
+        }
+    }
+
+    board.total_dots = dots_w * dots_h;
+    dots_x = dots_w;
+    dots_y = dots_h;
 }
 
 void game_render_loop() {
@@ -38,8 +74,8 @@ void game_render_loop() {
 
     DrawRectangle(0, 0, GetRenderWidth(), 60, gui_get_color("SECONDARY"));
     gui_draw_textblock(game_game_title);
-    gui_draw_button(game_game_reset_button, dialog_visible);
-    gui_draw_button(game_game_exit_button, dialog_visible);
+    gui_draw_button(game_game_reset_button, dialog_cover_entire);
+    gui_draw_button(game_game_exit_button, dialog_cover_entire);
 
     if(board_size == -1) {
         gui_draw_text_center(
@@ -93,6 +129,26 @@ void game_render_loop() {
         gui_get_color("TEXT")
     );
 
+    if(board.total_dots > 0) {
+        int each_w = board_w / dots_x;
+        int each_h = board_h / dots_y;
+
+        int dots_offset_x = 20;
+        int dots_offset_y = 20;
+
+        for(int y = 0; y < dots_y; y++) {
+            for(int x = 0; x < dots_x; x++) {
+                DrawRectangle(
+                    game_game_inner_bounds.x + (each_w * x) + dots_offset_x,
+                    game_game_inner_bounds.y + (each_h * y) + dots_offset_y,
+                    10,
+                    10,
+                    GREEN
+                );
+            }
+        }
+    }
+
     if(dialog_visible) {
         if(dialog_cover_entire) {
             DrawRectangle(
@@ -134,6 +190,26 @@ void game_render_loop() {
             game_game_inner_bounds.height,
             BLUE
         );
+
+        if(board.total_dots > 0) {
+            int each_w = board_w / dots_x;
+            int each_h = board_h / dots_y;
+
+            int dots_offset_x = 20;
+            int dots_offset_y = 20;
+
+            for(int y = 0; y < dots_y; y++) {
+                for(int x = 0; x < dots_x; x++) {
+                    DrawRectangleLines(
+                        game_game_inner_bounds.x + (each_w * x) + dots_offset_x,
+                        game_game_inner_bounds.y + (each_h * y) + dots_offset_y,
+                        10,
+                        10,
+                        YELLOW
+                    );
+                }
+            }
+        }
     }
 
     EndDrawing();
@@ -142,14 +218,18 @@ void game_render_loop() {
 void game_input_loop() {
     if(dialog_visible) {
         game_input_loop_dialog();
-        return;
+
+        if(dialog_cover_entire)
+            return;
     }
 
     Vector2 cursor = GetMousePosition();
 
     if(gui_button_pressed(game_game_exit_button, MOUSE_BUTTON_LEFT, cursor)) {
-        //game_start_menu();
-        game_enter_dialog(0);
+        if(dialog_type == 2)
+            game_start_menu();
+        else
+            game_enter_dialog(0);
     }
 
     if(gui_button_pressed(game_game_reset_button, MOUSE_BUTTON_LEFT, cursor)) {
@@ -212,7 +292,6 @@ void game_init() {
         30,
         0.5
     }, TXT("Reset game", 20));
-    game_game_reset_button.enabled = !game_disable_header_buttons;
 
     game_game_exit_button = BTN((RoundRectangle){
         // X Y Width Height Rounded
@@ -222,7 +301,6 @@ void game_init() {
         30,
         0.5
     }, TXT("Exit", 20));
-    game_game_exit_button.enabled = !game_disable_header_buttons;
 
     game_info_board = gui_rect_to_round(game_info_bounds);
     game_info_board.rounded = 0.05;
@@ -265,6 +343,7 @@ void game_enter_dialog(int type) {
         dialog_type = -1;
         dialog_visible = false;
         dialog_cover_entire = false;
+        game_disable_header_buttons = false;
         return;
     }
 
@@ -449,7 +528,10 @@ void game_input_loop_dialog() {
         }
     } else if(dialog_type == 1) {
         if(gui_button_pressed(game_game_reset_dialog.yes, MOUSE_BUTTON_LEFT, cursor)) {
-            /// @todo Add game resetting functionality
+            game_generate_board(board_size);
+            player_score = 0;
+            bot_score = 0;
+            game_update_data();
 
             game_enter_dialog(-1);
         }
@@ -459,7 +541,7 @@ void game_input_loop_dialog() {
         }
     } else if(dialog_type == 2) {
         if(gui_button_pressed(game_game_start_dialog.start, MOUSE_BUTTON_LEFT, cursor)) {
-            /// @todo Add game starting functionality
+            game_generate_board(board_size);
 
             game_enter_dialog(-1);
         }

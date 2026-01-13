@@ -10,7 +10,9 @@ enum {
 };
 
 typedef struct game_board_dot {
-    Vector2 pos;
+    int x;
+    int y;
+    int owned;
 } game_board_dot_t;
 
 typedef struct game_board_line {
@@ -20,7 +22,7 @@ typedef struct game_board_line {
 } game_board_line_t;
 
 typedef struct game_board_box {
-    game_board_dot_t dots[4];
+    game_board_dot_t* dots[4];
     game_board_line_t lines[4];
 
     int x;
@@ -29,11 +31,17 @@ typedef struct game_board_box {
 
 typedef struct game_board {
     game_board_box_t** boxes;
+    game_board_dot_t** dots;
+
+    int total_boxes;
+    int total_dots;
 } game_board_t;
 
 /// @brief Start the game with a specific board size
 /// @param size The board size (From the enum)
 void game_start(int size);
+
+void game_generate_board(int size);
 
 void game_render_loop();
 void game_input_loop();
@@ -56,11 +64,16 @@ extern char __b_score[3];
 extern int board_w;
 extern int board_h;
 
+extern int dots_x;
+extern int dots_y;
+
 extern int dialog_type;
 extern bool dialog_visible;
 extern bool dialog_cover_entire;
 
 extern bool game_disable_header_buttons;
+
+extern game_board_t board;
 
 // Bounds (Hold F2 to see)
 static Rectangle game_game_bounds;
