@@ -2,6 +2,7 @@
 
 #include "../main.h"
 #include <src/GameUI.h>
+#include <stdint.h>
 
 enum {
     BOARD_3X3 = 0,
@@ -10,11 +11,26 @@ enum {
 };
 
 typedef enum BOARD_PLACE {
-    BOARD_PLACE_BLANK   = -1,
+    BOARD_PLACE_BLANK   = 3,
     BOARD_PLACE_X       = 0,
     BOARD_PLACE_O       = 1,
     BOARD_PLACE_TIE     = 2     // Seems dumb being in this enum but it's important
 } BOARD_PLACE;
+
+typedef struct Point {
+    int x;
+    int y;
+} Point;
+
+typedef struct game_bot_board {
+    uint64_t wins;
+    uint64_t losses;
+    uint64_t ties;
+
+    uint64_t total;
+
+    bool valid;
+} game_bot_board_t;
 
 typedef struct game_bot_run {
     float** predictions;
@@ -22,15 +38,21 @@ typedef struct game_bot_run {
 
     int total_runs;
 
-    Vector2* options;
+    Point* options;
+    float* options_values;
     int total_options;
+
+    Point chosen_option;
+
+    bool had_immediate_win;
+    bool had_immediate_block;
 } game_bot_run_t;
 
 typedef struct game_bot {
     float** predictions;
     int size;
 
-    Vector2* options;
+    Point* options;
     int total_options;
 
     game_bot_run_t* last_run;
@@ -50,6 +72,10 @@ typedef struct game_board {
     int buttons;
 
     game_bot_t* bot;
+
+    /// @brief This is instead of the pos variable as seen below
+    Point** lines;
+    int total_lines;
 } game_board_t;
 
 /// @brief Start the game with a specific board size
@@ -57,6 +83,7 @@ typedef struct game_board {
 void game_start(int size);
 
 void game_generate_board(int size);
+void game_generate_lines(game_board_t* board);
 
 void game_render_loop();
 void game_input_loop();
@@ -67,8 +94,34 @@ void game_enter_dialog(int type);
 void game_render_loop_dialog();
 void game_input_loop_dialog();
 
+BOARD_PLACE game_check_winner(game_board_t* board);
+
 void game_buttons_generate(game_board_t* board, Rectangle bounds);
 void game_board_render(game_board_t* board, Rectangle bounds);
+
+void game_place(game_board_t* board, int x, int y, BOARD_PLACE player);
+void game_run_bot(game_board_t* board, BOARD_PLACE as);
+void game_bot_simulate(game_board_t* board,
+    game_bot_board_t* bot,
+    BOARD_PLACE as,
+    BOARD_PLACE active,
+    Point start);
+
+/*static uint8_t pos[8][3][2] = {
+    { { 0, 0 }, { 1, 0 }, { 2, 0 } }, // Top line       (A)
+    { { 0, 1 }, { 1, 1 }, { 2, 1 } }, // Middle line    (A)
+    { { 0, 2 }, { 1, 2 }, { 2, 2 } }, // Bottom line    (A)
+    { { 0, 0 }, { 0, 1 }, { 0, 2 } }, // Left line      (D)
+    { { 1, 0 }, { 1, 1 }, { 1, 2 } }, // Middle line    (D)
+    { { 2, 0 }, { 2, 1 }, { 2, 2 } }, // Right line     (D)
+    { { 0, 0 }, { 1, 1 }, { 2, 2 } }, // Top left  -> Bottom right
+    { { 2, 0 }, { 1, 1 }, { 0, 2 } }  // Top right -> Bottom left
+};*/
+
+// This is the function that actually runs the bot
+Point game_bot_check_blocks(game_board_t* board, BOARD_PLACE as);
+Point game_bot_check_win(game_board_t* board, BOARD_PLACE as);
+game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as);
 
 extern BOARD_PLACE winner;
 extern BOARD_PLACE turn;

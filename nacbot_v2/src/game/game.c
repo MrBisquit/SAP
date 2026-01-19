@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <memory.h>
 #include "../main.h"
 #include "game.h"
 #include "../../../utils/src/GameUI.h"
@@ -6,6 +7,8 @@
 // Tons of global values because it's just easiser
 static int board_size = -1;
 static int board_size_squares = 0;
+
+bool use_3_options = true;
 
 BOARD_PLACE winner = BOARD_PLACE_BLANK;
 BOARD_PLACE turn = BOARD_PLACE_X;
@@ -49,9 +52,9 @@ void game_generate_board(int size) {
     if(size == BOARD_3X3) {
         boxes = 3;
     } else if(size == BOARD_4X4) {
-        boxes = 3;
-    } else if(size == BOARD_4X4) {
-        boxes = 3;
+        boxes = 4;
+    } else if(size == BOARD_5X5) {
+        boxes = 5;
     }
 
     board.places = calloc(boxes, sizeof(BOARD_PLACE*));
@@ -72,6 +75,72 @@ void game_generate_board(int size) {
             board.places[y][x] = BOARD_PLACE_BLANK;
         }
     }
+
+    game_generate_lines(&board);
+}
+
+void game_generate_lines(game_board_t* board) {
+    int total_down = board->size;
+    int total_across = board->size;
+    int total_diagonal = 2;
+    int total = total_down + total_across + total_diagonal;
+
+    board->total_lines = total;
+    board->lines = calloc(total, sizeof(Point*));
+    
+    for(int i = 0; i < total; i++) {
+        board->lines[i] = calloc(board->size, sizeof(Point));
+    }
+
+    int i = 0;
+    
+    /*
+        i = Index of the line (Not important)
+        j = Position on the point
+        k = Individual point
+    */
+
+    // Down
+    for(int j = 0; j < total_down; j++) {
+        for(int k = 0; k < board->size; k++) {
+            board->lines[i][k] = (Point) { .x = j, .y = k };
+            //printf("(%d) Down X %d Y %d\n", i, j, k);
+        }
+
+        i++;
+    }
+
+    // Across
+    for(int j = 0; j < total_across; j++) {
+        for(int k = 0; k < board->size; k++) {
+            board->lines[i][k] = (Point) { .x = k, .y = j };
+            //printf("(%d) Across X %d Y %d\n", i, k, j);
+        }
+
+        i++;
+    }
+
+    // Diagonal (TL --> BR)
+    for(int j = 0; j < board->size; j++) {
+        board->lines[i][j] = (Point) { .x = j, .y = j };
+        //printf("(%d) TL->BR X %d Y %d\n", i, j, j);
+    }
+    i++;
+
+    // Diagonal (TR --> BL)
+    for(int j = 0; j < board->size; j++) {
+        board->lines[i][j] = (Point) { .x = board->size - j - 1, .y = j };
+        //printf("(%d) TR->BL X %d Y %d\n", i, board->size - j - 1, j);
+    }
+
+    // Check
+    //printf("\nChecking...\n");
+    /*for(int j = 0; j < total; j++) {
+        printf("(%d)\n", j);
+        for(int k = 0; k < board->size; k++) {
+            printf("X %d Y %d\n", board->lines[j][k].x, board->lines[j][k].y);
+        }
+    }*/
 }
 
 void game_render_loop() {
@@ -190,6 +259,16 @@ void game_input_loop() {
 
     if(gui_button_pressed(game_game_reset_button, MOUSE_BUTTON_LEFT, cursor)) {
         game_enter_dialog(1);
+    }
+
+    for(int y = 0; y < board.size; y++) {
+        for(int x = 0; x < board.size; x++) {
+            printf("X %d Y %d:\t(i)\t%d\n", x, y, board.places[y][x]);
+        }
+    }
+
+    if(turn == BOARD_PLACE_O) {
+        game_run_bot(&board, BOARD_PLACE_O);
     }
 }
 
@@ -493,6 +572,43 @@ void game_input_loop_dialog() {
     }
 }
 
+BOARD_PLACE game_check_winner(game_board_t* board) {
+    //printf("\nChecking for winner...\n");
+    int total_empty = 0;
+    for(int y = 0; y < board->size; y++) {
+        for(int x = 0; x < board->size; x++) {
+            if(board->places[y][x] == BOARD_PLACE_BLANK)
+                total_empty++;
+        }
+    }
+
+    if(total_empty == 0)
+        return BOARD_PLACE_TIE;
+
+    BOARD_PLACE player = BOARD_PLACE_BLANK;
+
+    /*for(int i = 0; i < board->total_lines; i++) {
+        for(int j = 0; j < board->size; j++) {
+            printf("X %d Y %d\n", board->lines[i][j].x, board->lines[i][j].x);
+        }
+    }*/
+
+    for(int i = 0; i < board->total_lines; i++) {
+        player = board->places[board->lines[i][0].y][board->lines[i][0].x];
+        bool win = true;
+        for(int j = 0; j < board->size; j++) {
+            BOARD_PLACE now_player = board->places[board->lines[i][j].y][board->lines[i][j].x];
+            if(player != now_player) win = false;
+            player = now_player;
+
+            //printf("X %d Y %d V %d\n", board->lines[i][j].x, board->lines[i][j].y, now_player);
+        }
+        if(win == true && player != BOARD_PLACE_BLANK) return player;
+    }
+
+    return BOARD_PLACE_BLANK;
+}
+
 void game_buttons_generate(game_board_t* board, Rectangle bounds) {
     Vector2 cursor = GetMousePosition();
 
@@ -522,7 +638,7 @@ void game_buttons_generate(game_board_t* board, Rectangle bounds) {
             gui_text_t text = TXT("", 30);
             bool enabled = true;
             if(board->places[y][x] == BOARD_PLACE_BLANK) {
-
+                normal = gui_get_color("BACKGROUND");
             } else {
                 enabled = false;
                 if(board->places[y][x] == BOARD_PLACE_X) {
@@ -574,6 +690,10 @@ void game_board_render(game_board_t* board, Rectangle bounds) {
 
     for(int i = 0; i < board->buttons; i++) {
         gui_draw_button(board->board_buttons[i].button, dialog_visible);
+        if(gui_button_pressed(board->board_buttons[i].button, MOUSE_BUTTON_LEFT, cursor) &&
+            turn == BOARD_PLACE_X) { 
+                game_place(board, board->board_buttons[i].x, board->board_buttons[i].y, BOARD_PLACE_X);
+        }
     }
 
     for(int y = 0; y < board_size_squares; y++) {
@@ -611,124 +731,199 @@ void game_board_render(game_board_t* board, Rectangle bounds) {
             }
         }
     }
+}
 
-    /*board->boxes[0][0].owned = 1;
-    board->boxes[0][0].lines[0].owned = 1;
-    board->boxes[0][0].lines[1].owned = 1;
-    board->boxes[0][0].lines[2].owned = 1;
-    board->boxes[0][0].lines[3].owned = 1;
-    board->boxes[0][1].owned = 0;
+void game_place(game_board_t* board, int x, int y, BOARD_PLACE player) {
+    if(board->places[y][x] != BOARD_PLACE_BLANK)
+        return;
 
-    for(int y = 0; y < boxes_y; y++) {
-        for(int x = 0; x < boxes_x; x++) {
-            Color c;
+    board->places[y][x] = player;
 
-            if(board->boxes[y][x].owned == -1) {
-                c.a = 0;
-            } else if(board->boxes[y][x].owned == 0) {
-                c = BLUE;
-                c.a /= 2;
+    game_buttons_generate(board, game_game_inner_bounds);
+
+    turn = player == BOARD_PLACE_X ? BOARD_PLACE_O : BOARD_PLACE_X;
+
+    BOARD_PLACE winner = game_check_winner(board);
+    if(winner != BOARD_PLACE_BLANK) {
+        game_start_menu();
+    }
+}
+
+void game_run_bot(game_board_t* board, BOARD_PLACE as) {
+    game_bot_run_t run = game_bot_run(board, as);
+    game_place(board, run.chosen_option.x, run.chosen_option.y, as);
+}
+
+Point game_bot_check_blocks(game_board_t* board, BOARD_PLACE as) {
+    BOARD_PLACE op = as == BOARD_PLACE_X ? BOARD_PLACE_O : BOARD_PLACE_X;
+    /*for (uint8_t i = 0; i < 8; i++)
+    {
+        uint8_t used = 0;
+        Point unused = { -1, -1 };
+        for (uint8_t j = 0; j < 3; j++)
+        {
+            if(board->places[pos[i][j][0]][pos[i][j][1]] == op) used++;
+            else unused = (Point){ pos[i][j][0], pos[i][j][1] };
+        }
+        if(used == 2 && board->places[unused.y][unused.x] == BOARD_PLACE_BLANK) return unused;
+    }*/
+
+    for(int i = 0; i < board->total_lines; i++) {
+        uint8_t used = 0;
+        Point unused = { -1, -1 };
+        for(int j = 0; j < board->size; j++) {
+            if(board->places[board->lines[i][j].x][board->lines[i][j].y] == op) used++;
+            else unused = (Point){ board->lines[i][j].x, board->lines[i][j].y };
+        }
+        if(used == 2 && board->places[unused.y][unused.x] == BOARD_PLACE_BLANK) return unused;
+    }
+    return (Point) { -1, -1 };
+}
+
+Point game_bot_check_win(game_board_t* board, BOARD_PLACE as) {
+    /*for (uint8_t i = 0; i < 8; i++)
+    {
+        uint8_t used = 0;
+        Point unused;
+        for (uint8_t j = 0; j < 3; j++)
+        {
+            if(board->places[pos[i][j][0]][pos[i][j][1]] == as) used++;
+            else unused = (Point){ pos[i][j][0], pos[i][j][1] };
+        }
+        if(used == 2 && board->places[unused.y][unused.x] == BOARD_PLACE_BLANK) return unused;
+    }*/
+
+    for(int i = 0; i < board->total_lines; i++) {
+        uint8_t used = 0;
+        Point unused = { -1, -1 };
+        for(int j = 0; j < board->size; j++) {
+            if(board->places[board->lines[i][j].x][board->lines[i][j].y] == as) used++;
+            else unused = (Point){ board->lines[i][j].x, board->lines[i][j].y };
+        }
+        if(used == 2 && board->places[unused.y][unused.x] == BOARD_PLACE_BLANK) return unused;
+    }
+    return (Point){ -1, -1 };
+}
+
+game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as) {
+    game_bot_run_t run = {
+        NULL, board->size,
+
+        0,
+    
+        NULL, NULL, 0,
+
+        NULL, false, false
+    };
+    run.options = calloc(3, sizeof(Point));
+    run.options_values = calloc(3, sizeof(float));
+    run.total_options = 3;
+    
+    // Options go right (good) --> left (bad)
+    // If 3 options mode is turned off, it will just use the leftmost option,
+    // if not, it will simply pick one randomly from the 3 options
+
+    Point win = game_bot_check_win(board, as);
+    Point block = game_bot_check_blocks(board, as);
+
+    // However, if a win or block is available, it will just completely
+    // ignore any next steps, and immediately go for that option
+
+    if(win.x != -1 && win.y != -1) {
+        run.chosen_option = win;
+        run.had_immediate_win = true;
+        return run;
+    }
+
+    if(block.x != -1 && block.y != -1) {
+        run.chosen_option = block;
+        run.had_immediate_block = true;
+        return run;
+    }
+
+    run.chosen_option = (Point){ 0, 0 };
+
+    run.predictions = calloc(board->size, sizeof(float*));
+    for(int i = 0; i < board->size; i++)
+        run.predictions[i] = calloc(board->size, sizeof(float));
+
+    game_bot_board_t** bot = calloc(board->size, sizeof(game_bot_board_t*));
+    for(int i = 0; i < board->size; i++)
+        bot[i] = calloc(board->size, sizeof(game_bot_board_t));
+
+    for(int y = 0; y < board->size; y++) {
+        for(int x = 0; x < board->size; x++) {
+            if(board->places[y][x] == BOARD_PLACE_BLANK) {
+                bot[y][x].valid = true;
+                game_bot_simulate(board, &bot[y][x], as, as, (Point){ x, y });
+                run.total_runs += bot[y][x].total;
+
+                float w = bot[y][x].wins;
+                float l = bot[y][x].losses;
+                float t = bot[y][x].ties;
+
+                //run.predictions[y][x] = w / (w + l + t);
+                run.predictions[y][x] = w / (w + l);
             } else {
-                c = RED;
-                c.a /= 2;
-            }
-
-            int _x = bounds.x + (each_w * x) + dots_offset_x;
-            int _y = bounds.y + (each_h * y) + dots_offset_y;
-            int _w = each_w;
-            int _h = each_h;
-
-            DrawRectangle(_x, _y, _w, _h, c);
-
-            for(int i = 0; i < 4; i++) {
-                Color _c;
-
-                int _fx = board->boxes[y][x].lines[i].from->circle.x;
-                int _fy = board->boxes[y][x].lines[i].from->circle.y;
-                int _tx = board->boxes[y][x].lines[i].to->circle.x;
-                int _ty = board->boxes[y][x].lines[i].to->circle.y;
-
-                if(board->boxes[y][x].lines[i].owned == -1) {
-                    _c = gui_get_color("BUTTON");
-                    _c.a = 255;
-                    _c.r /= 2;
-                    _c.g /= 2;
-                    _c.b /= 2;
-                } else if(board->boxes[y][x].lines[i].owned == 0) {
-                    _c = BLUE;
-                } else {
-                    _c = RED;
-                }
-
-                DrawLineEx(
-                    (Vector2) { _fx, _fy },
-                    (Vector2) { _tx, _ty },
-                    7.5,
-                    _c
-                );
+                bot[y][x].valid = false;
+                run.predictions[y][x] = -1;
             }
         }
     }
 
-    for(int y = 0; y < dots_y; y++) {
-        for(int x = 0; x < dots_x; x++) {
-            Color c;
-
-            if(board->dots[y][x].owned == -1) {
-                c = gui_get_color("BUTTON"); // Just because it's a bright colour
-            } else if(board->dots[y][x].owned == 0) {
-                c = BLUE;
-            } else {
-                c = RED;
-            }
-
-            int _x = bounds.x + (each_w * x) + dots_offset_x;
-            int _y = bounds.y + (each_h * y) + dots_offset_y;
-            int _w = 10;
-            int _h = 10;
-
-            //DrawCircle(_x + (_w / 2), _y + (_h / 2), 10, c);
-
-            board->dots[y][x].circle = CIR((Vector2){ _x, _y}, 10, 0, true);
-
-            if(gui_point_in_circle(cursor, board->dots[y][x].circle) &&
-                !dialog_visible &&
-                board->dots[y][x].owned == -1) {
-                c.r *= 2;
-                c.g *= 2;
-                c.b *= 2;
-                SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-            }
-
-            if(gui_point_in_circle(cursor, board->dots[y][x].circle) &&
-                !dialog_visible &&
-                board->dots[y][x].owned == -1 &&
-                IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-                if(dot_dragging) {
-                    c.r *= 2;
-                    c.g *= 2;
-                    c.b *= 2;
-                    SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
-                } else {
-                    dot_dragging = true;
-                    first_dot = &board->dots[y][x];
-                }
-            }
-
-            if(IsMouseButtonUp(MOUSE_BUTTON_LEFT) && dot_dragging)
-                dot_dragging = false;
-
-            if(dot_dragging) {
-                DrawLineEx(
-                    (Vector2){ first_dot->circle.x, first_dot->circle.y },
-                    cursor,
-                    5,
-                    BLUE
-                );
-            }
-
-            c.a = 255;
-            gui_draw_circle(board->dots[y][x].circle, c);
+    for(int y = 0; y < board->size; y++) {
+        for(int x = 0; x < board->size; x++) {
+            //if(bot[y][x].valid)
+                //printf("X %d Y %d:\t%f\n", x, y, run.predictions[y][x]);
+            //else
+                //printf("X %d Y %d:\t(i)\t%d\n", x, y, board->places[y][x]);
         }
-    }*/
+    }
+
+    return run;
+}
+
+void game_bot_simulate(game_board_t* board,
+    game_bot_board_t* bot,
+    BOARD_PLACE as,
+    BOARD_PLACE active,
+    Point start) {
+    // Copy active board
+    game_board_t b;
+    memcpy_s(&b, sizeof(game_board_t), board, sizeof(game_board_t));
+
+    b.places[start.y][start.x] = as;
+
+    BOARD_PLACE winner = game_check_winner(&b);
+    if(winner != BOARD_PLACE_BLANK) {
+        if(as == active) {
+            // If it's the bots move
+            if(winner == as) bot->wins++;
+            if(winner == BOARD_PLACE_TIE) bot->ties++;
+            else bot->losses++;
+        } else {
+            // If it's the players move
+            if(winner == as) bot->losses++;
+            if(winner == BOARD_PLACE_TIE) bot->ties++;
+            else bot->wins++;
+        }
+
+        bot->total++;
+
+        return;
+    }
+
+    // Switch turn
+    if(active == BOARD_PLACE_X)
+        active = BOARD_PLACE_O;
+    else
+        active = BOARD_PLACE_O;
+
+    for(int y = 0; y < board->size; y++) {
+        for(int x = 0; x < board->size; x++) {
+            if(board->places[y][x] == BOARD_PLACE_BLANK) {
+                game_bot_simulate(board, &b, as, active, (Point){ x, y });
+            }
+        }
+    }
 }
