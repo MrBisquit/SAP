@@ -734,6 +734,7 @@ void game_place(game_board_t* board, int x, int y, BOARD_PLACE player) {
         return;
 
     board->places[y][x] = player;
+    printf("Set X %d Y %d to %d\n", x, y, player);
 
     game_buttons_generate(board, game_game_inner_bounds);
 
@@ -746,6 +747,21 @@ void game_place(game_board_t* board, int x, int y, BOARD_PLACE player) {
 }
 
 void game_run_bot(game_board_t* board, BOARD_PLACE as) {
+    printf("RUN Board:\n");
+    for(int y = 0; y < board->size; y++) {
+        for(int x = 0; x < board->size; x++) {
+            if(board->places[y][x] == BOARD_PLACE_BLANK)
+                printf("_ ");
+            else if(board->places[y][x] == BOARD_PLACE_X)
+                printf("X ");
+            else if(board->places[y][x] == BOARD_PLACE_O)
+                printf("O ");
+            else
+                printf("? ");
+        }
+        printf("\n");
+    }
+
     game_bot_run_t run = game_bot_run(board, as);
     game_place(board, run.chosen_option.x, run.chosen_option.y, as);
 }
@@ -802,8 +818,9 @@ Point game_bot_check_win(game_board_t* board, BOARD_PLACE as) {
 }
 
 game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as) {
+    int size = board->size;
     game_bot_run_t run = {
-        NULL, board->size,
+        NULL, size,
 
         0,
     
@@ -873,6 +890,8 @@ game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as) {
         }
     }
 
+    free(bot);
+
     for(int y = 0; y < board->size; y++) {
         for(int x = 0; x < board->size; x++) {
             bool added = game_bot_add_option(board, &run, (Point){ x, y }, run.predictions[y][x]);
@@ -911,11 +930,14 @@ void game_bot_simulate(game_board_t* board,
     BOARD_PLACE as,
     BOARD_PLACE active,
     Point start) {
+    /// @bug The board data is being corrupted somewhere in this function
     // Copy active board
     game_board_t b;
-    memcpy_s(&b, sizeof(game_board_t), board, sizeof(game_board_t));
+    //memcpy_s(&b, sizeof(game_board_t), board, sizeof(game_board_t));
+    //memcpy(&b, board, sizeof(game_board_t));
+    game_utils_copy_board(board, &b);
 
-    b.places[start.y][start.x] = as;
+    b.places[start.y][start.x] = active; //as;
 
     BOARD_PLACE winner = game_check_winner(&b);
     if(winner != BOARD_PLACE_BLANK) {
@@ -936,16 +958,17 @@ void game_bot_simulate(game_board_t* board,
         return;
     }
 
+    BOARD_PLACE next;
     // Switch turn
     if(active == BOARD_PLACE_X)
-        active = BOARD_PLACE_O;
+        next = BOARD_PLACE_O;
     else
-        active = BOARD_PLACE_O;
+        next = BOARD_PLACE_O;
 
     for(int y = 0; y < board->size; y++) {
         for(int x = 0; x < board->size; x++) {
-            if(board->places[y][x] == BOARD_PLACE_BLANK) {
-                game_bot_simulate(&b, bot, as, active, (Point){ x, y });
+            if(b.places[y][x] == BOARD_PLACE_BLANK) {
+                game_bot_simulate(&b, bot, as, next, (Point){ x, y });
             }
         }
     }
@@ -975,4 +998,29 @@ bool game_bot_add_option(game_board_t* board, game_bot_run_t* run, Point option,
     }
                 
     return false;
+}
+
+void game_utils_copy_board(game_board_t* src, game_board_t* dest) {
+    dest->total_lines = src->total_lines;
+    dest->buttons = src->buttons;
+    dest->size = src->size;
+    
+    dest->board_buttons = calloc(dest->buttons, sizeof(game_board_button_t));
+    for(int i = 0; i < dest->buttons; i++) {
+        memcpy(&dest->board_buttons[i], &src->board_buttons[i], sizeof(game_board_button_t));
+    }
+
+    // No point in not copying the pointers for this
+    //memcpy(dest->lines, src->lines, sizeof(Point**));
+    dest->lines = src->lines;
+    //memcpy(dest->bot, src->bot, sizeof(game_bot_t));
+    dest->bot = src->bot;
+
+    dest->places = calloc(dest->size, sizeof(BOARD_PLACE*));
+    for(int i = 0; i < dest->size; i++) {
+        dest->places[i] = calloc(dest->size, sizeof(BOARD_PLACE));
+        for(int j = 0; j < dest->size; j++) {
+            dest->places[i][j] = src->places[i][j];
+        }
+    }
 }

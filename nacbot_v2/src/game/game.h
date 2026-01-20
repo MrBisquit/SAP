@@ -11,7 +11,7 @@ enum {
 };
 
 typedef enum BOARD_PLACE {
-    BOARD_PLACE_BLANK   = 3,
+    BOARD_PLACE_BLANK   = -1,
     BOARD_PLACE_X       = 0,
     BOARD_PLACE_O       = 1,
     BOARD_PLACE_TIE     = 2     // Seems dumb being in this enum but it's important
@@ -123,6 +123,9 @@ bool game_bot_add_option(game_board_t* board, game_bot_run_t* run, Point option,
 Point game_bot_check_blocks(game_board_t* board, BOARD_PLACE as);
 Point game_bot_check_win(game_board_t* board, BOARD_PLACE as);
 game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as);
+
+// Copies the board
+void game_utils_copy_board(game_board_t* src, game_board_t* dest);
 
 extern BOARD_PLACE winner;
 extern BOARD_PLACE turn;
