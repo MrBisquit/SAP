@@ -23,11 +23,11 @@ typedef struct Point {
 } Point;
 
 typedef struct game_bot_board {
-    uint64_t wins;
-    uint64_t losses;
-    uint64_t ties;
+    int wins;
+    int losses;
+    int ties;
 
-    uint64_t total;
+    int total;
 
     bool valid;
 } game_bot_board_t;
@@ -126,6 +126,7 @@ game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as);
 
 // Copies the board
 void game_utils_copy_board(game_board_t* src, game_board_t* dest);
+void game_utils_free_board(game_board_t* board);
 
 extern BOARD_PLACE winner;
 extern BOARD_PLACE turn;

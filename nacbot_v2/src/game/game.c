@@ -873,21 +873,34 @@ game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as) {
     for(int y = 0; y < board->size; y++) {
         for(int x = 0; x < board->size; x++) {
             if(board->places[y][x] == BOARD_PLACE_BLANK) {
+                printf(".");
+
                 bot[y][x].valid = true;
                 game_bot_simulate(board, &bot[y][x], as, as, (Point){ x, y });
                 run.total_runs += bot[y][x].total;
 
-                float w = bot[y][x].wins;
-                float l = bot[y][x].losses;
-                float t = bot[y][x].ties;
+                int w = bot[y][x].wins;
+                int l = bot[y][x].losses;
+                int t = bot[y][x].ties;
 
-                //run.predictions[y][x] = w / (w + l + t);
-                run.predictions[y][x] = w / (w + l);
+                float fw = (float)w;
+                float fl = (float)l;
+                float ft = (float)t;
+
+                run.predictions[y][x] = fw / (fw + fl + ft);
+                //run.predictions[y][x] = (float)((float)w / ((float)w + (float)l));
+
+                printf("W %d L %d T %d V %f\n", w, l, t,  run.predictions[y][x]);
             } else {
                 bot[y][x].valid = false;
                 run.predictions[y][x] = -1;
+
+                printf("W %f L %f T %f\n", 0, 0, 0);
             }
+
+            //printf("%f\t", bot[y][x]);
         }
+        printf("\n");
     }
 
     free(bot);
@@ -932,12 +945,12 @@ void game_bot_simulate(game_board_t* board,
     Point start) {
     /// @bug The board data is being corrupted somewhere in this function
     // Copy active board
-    game_board_t b;
+    game_board_t b = *board;
     //memcpy_s(&b, sizeof(game_board_t), board, sizeof(game_board_t));
     //memcpy(&b, board, sizeof(game_board_t));
-    game_utils_copy_board(board, &b);
+    //game_utils_copy_board(board, &b);
 
-    b.places[start.y][start.x] = active; //as;
+    b.places[start.y][start.x] = active; // as;
 
     BOARD_PLACE winner = game_check_winner(&b);
     if(winner != BOARD_PLACE_BLANK) {
@@ -955,6 +968,8 @@ void game_bot_simulate(game_board_t* board,
 
         bot->total++;
 
+        // Reset
+        b.places[start.y][start.x] = BOARD_PLACE_BLANK;
         return;
     }
 
@@ -972,6 +987,9 @@ void game_bot_simulate(game_board_t* board,
             }
         }
     }
+
+    b.places[start.y][start.x] = BOARD_PLACE_BLANK;
+    //game_utils_free_board(&b);
 }
 
 bool game_bot_add_option(game_board_t* board, game_bot_run_t* run, Point option, float option_value) {
@@ -1002,13 +1020,13 @@ bool game_bot_add_option(game_board_t* board, game_bot_run_t* run, Point option,
 
 void game_utils_copy_board(game_board_t* src, game_board_t* dest) {
     dest->total_lines = src->total_lines;
-    dest->buttons = src->buttons;
+    //dest->buttons = src->buttons;
     dest->size = src->size;
     
-    dest->board_buttons = calloc(dest->buttons, sizeof(game_board_button_t));
-    for(int i = 0; i < dest->buttons; i++) {
-        memcpy(&dest->board_buttons[i], &src->board_buttons[i], sizeof(game_board_button_t));
-    }
+    //dest->board_buttons = calloc(dest->buttons, sizeof(game_board_button_t));
+    //for(int i = 0; i < dest->buttons; i++) {
+    //    memcpy(&dest->board_buttons[i], &src->board_buttons[i], sizeof(game_board_button_t));
+    //}
 
     // No point in not copying the pointers for this
     //memcpy(dest->lines, src->lines, sizeof(Point**));
@@ -1023,4 +1041,11 @@ void game_utils_copy_board(game_board_t* src, game_board_t* dest) {
             dest->places[i][j] = src->places[i][j];
         }
     }
+}
+
+void game_utils_free_board(game_board_t* board) {
+    for(int i = 0; i < board->size; i++) {
+        free(board->places[i]);
+    }
+    free(board->places);
 }
