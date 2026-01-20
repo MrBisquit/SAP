@@ -42,6 +42,10 @@ void game_start(int size) {
         board_w = 450;
         board_h = 450;
         board_size_squares = 5;
+    } else if(size == BOARD_10X10) {
+        board_w = 550;
+        board_h = 550;
+        board_size_squares = 10;
     }
 }
 
@@ -55,6 +59,8 @@ void game_generate_board(int size) {
         boxes = 4;
     } else if(size == BOARD_5X5) {
         boxes = 5;
+    } else if(size == BOARD_10X10) {
+        boxes = 10;
     }
 
     gui_rand_seed();

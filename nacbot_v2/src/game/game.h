@@ -7,7 +7,8 @@
 enum {
     BOARD_3X3 = 0,
     BOARD_4X4 = 1,
-    BOARD_5X5 = 2
+    BOARD_5X5 = 2,
+    BOARD_10X10 = 3
 };
 
 typedef enum BOARD_PLACE {
