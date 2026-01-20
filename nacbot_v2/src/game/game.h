@@ -106,6 +106,7 @@ void game_bot_simulate(game_board_t* board,
     BOARD_PLACE as,
     BOARD_PLACE active,
     Point start);
+bool game_bot_add_option(game_board_t* board, game_bot_run_t* run, Point option, float option_value);
 
 /*static uint8_t pos[8][3][2] = {
     { { 0, 0 }, { 1, 0 }, { 2, 0 } }, // Top line       (A)

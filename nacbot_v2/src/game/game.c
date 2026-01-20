@@ -57,6 +57,8 @@ void game_generate_board(int size) {
         boxes = 5;
     }
 
+    gui_rand_seed();
+
     board.places = calloc(boxes, sizeof(BOARD_PLACE*));
     board.size = boxes;
 
@@ -259,12 +261,6 @@ void game_input_loop() {
 
     if(gui_button_pressed(game_game_reset_button, MOUSE_BUTTON_LEFT, cursor)) {
         game_enter_dialog(1);
-    }
-
-    for(int y = 0; y < board.size; y++) {
-        for(int x = 0; x < board.size; x++) {
-            printf("X %d Y %d:\t(i)\t%d\n", x, y, board.places[y][x]);
-        }
     }
 
     if(turn == BOARD_PLACE_O) {
@@ -818,6 +814,12 @@ game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as) {
     run.options = calloc(3, sizeof(Point));
     run.options_values = calloc(3, sizeof(float));
     run.total_options = 3;
+
+    for(int i = 0; i < run.total_options; i++) {
+        run.options[i].x = -1;
+        run.options[i].y = -1;
+        run.options_values[i] = -1;
+    }
     
     // Options go right (good) --> left (bad)
     // If 3 options mode is turned off, it will just use the leftmost option,
@@ -873,11 +875,32 @@ game_bot_run_t game_bot_run(game_board_t* board, BOARD_PLACE as) {
 
     for(int y = 0; y < board->size; y++) {
         for(int x = 0; x < board->size; x++) {
+            bool added = game_bot_add_option(board, &run, (Point){ x, y }, run.predictions[y][x]);
+
             //if(bot[y][x].valid)
                 //printf("X %d Y %d:\t%f\n", x, y, run.predictions[y][x]);
             //else
                 //printf("X %d Y %d:\t(i)\t%d\n", x, y, board->places[y][x]);
         }
+    }
+
+    int selected = gui_rand(0, run.total_options);
+    printf("Selected X %d Y %d V %f\n", run.options[selected].x,
+        run.options[selected].y, run.options_values[selected]);
+    if(run.options_values[selected] == -1) {
+        // No available option, so assume there are no options
+        printf("No available options\n");
+        for(int y = 0; y < board->size; y++) {
+            for(int x = 0; x < board->size; x++) {
+                if(board->places[y][x] == BOARD_PLACE_BLANK) {
+                    run.chosen_option = (Point){ x, y };
+                    return run;
+                }
+            }
+        }
+    } else {
+        run.chosen_option = run.options[selected];
+        return run;
     }
 
     return run;
@@ -922,8 +945,34 @@ void game_bot_simulate(game_board_t* board,
     for(int y = 0; y < board->size; y++) {
         for(int x = 0; x < board->size; x++) {
             if(board->places[y][x] == BOARD_PLACE_BLANK) {
-                game_bot_simulate(board, &b, as, active, (Point){ x, y });
+                game_bot_simulate(&b, bot, as, active, (Point){ x, y });
             }
         }
     }
+}
+
+bool game_bot_add_option(game_board_t* board, game_bot_run_t* run, Point option, float option_value) {
+    for(int i = 0; i < run->total_options; i++) {
+        if(option_value > run->options_values[i]) {
+            if(i == run->total_options) {
+                run->options[i] = option;
+                run->options_values[i] = option_value;
+                
+                return true;
+            }
+            else {
+                // Push back and add
+                for(int j = run->total_options; j > i; j--) {
+                    run->options[j] = run->options[j - 1];
+                    run->options[j] = run->options[j - 1];
+                }
+                run->options[i] = option;
+                run->options_values[i] = option_value;
+
+                return true;
+            }
+        }
+    }
+                
+    return false;
 }
