@@ -2,6 +2,7 @@
 
 #include <src/GameUI.h>
 #include "game/game.h"
+#include "game/bot.h"
 
 #define AI_NAME "SAP-NACBOT-V2-L1-L3"
 
@@ -25,6 +26,7 @@ enum {
 static int current_mode = MODE_MENU;
 
 extern bool use_3_options;
+extern int bot_type;
 
 void game_start_menu();
 void game_start_game();

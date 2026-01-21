@@ -5,8 +5,28 @@
 static gui_textblock_t game_game_options_title;
 static gui_textblock_t game_game_options_subtitle;
 
-static gui_button_t game_game_options_normal_3x3;
-static gui_button_t game_game_options_normal_4x4;
-static gui_button_t game_game_options_normal_5x5;
+//static gui_button_t game_game_options_normal_3x3;
+//static gui_button_t game_game_options_normal_4x4;
+//static gui_button_t game_game_options_normal_5x5;
+
+static gui_button_t game_game_options_normal_3x3_button;
+static gui_textblock_t game_game_options_normal_3x3_textblock;
+static gui_checkbox_t game_game_options_normal_3x3_checkbox;
+
+static gui_button_t game_game_options_normal_4x4_button;
+static gui_textblock_t game_game_options_normal_4x4_textblock;
+static gui_checkbox_t game_game_options_normal_4x4_checkbox;
+
+static gui_button_t game_game_options_normal_5x5_button;
+static gui_textblock_t game_game_options_normal_5x5_textblock;
+static gui_checkbox_t game_game_options_normal_5x5_checkbox;
+
+static gui_button_t game_game_options_normal_10x10_button;
+static gui_textblock_t game_game_options_normal_10x10_textblock;
+static gui_checkbox_t game_game_options_normal_10x10_checkbox;
+
+static gui_button_t game_game_options_normal_20x20_button;
+static gui_textblock_t game_game_options_normal_20x20_textblock;
+static gui_checkbox_t game_game_options_normal_20x20_checkbox;
 
 static gui_button_t game_game_options_back_button;

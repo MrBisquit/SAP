@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../main.h"
+#include "bot.h"
 #include <src/GameUI.h>
 #include <stdint.h>
 

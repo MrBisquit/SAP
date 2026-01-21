@@ -3,12 +3,14 @@
 #include "../main.h"
 #include "game.h"
 #include "../../../utils/src/GameUI.h"
+//#include "bot.h"
 
 // Tons of global values because it's just easiser
 static int board_size = -1;
 static int board_size_squares = 0;
 
 bool use_3_options = true;
+int bot_type = 1; // 0 = V1 (best for 3x3), 1 = V2 (4x4+)
 
 BOARD_PLACE winner = BOARD_PLACE_BLANK;
 BOARD_PLACE turn = BOARD_PLACE_X;
@@ -23,6 +25,12 @@ bool dialog_cover_entire = false;
 bool game_disable_header_buttons = false;
 
 game_board_t board;
+game_bot_v2_t bot;
+
+bool playing = false;
+bool has_win = false;
+Point win_a = { 0, 0 };
+Point win_b = { 0, 0 };
 
 void game_start(int size) {
     board_size = size;
@@ -354,6 +362,9 @@ void game_init() {
 
     if(board_size_squares > 0)
         game_buttons_generate(&board, game_game_inner_bounds);
+
+    if(bot_type == 1)
+        game_bot_v2_init_bot(&bot, board.size);
 }
 
 void game_handle_resize(Rectangle old, Rectangle current) {
