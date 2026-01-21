@@ -4,6 +4,7 @@
 #include "game/game.h"
 
 int selected = 0;
+int selected_bot = 0;
 
 typedef struct game_game_option {
     gui_button_t* btn;
@@ -48,12 +49,47 @@ game_game_options_t opts[] = {
         &game_game_options_normal_20x20_checkbox,
 
         "20x20"
+    },
+    {
+        &game_game_options_normal_30x30_button,
+        &game_game_options_normal_30x30_textblock,
+        &game_game_options_normal_30x30_checkbox,
+
+        "30x30"
+    },
+    {
+        &game_game_options_normal_40x40_button,
+        &game_game_options_normal_40x40_textblock,
+        &game_game_options_normal_40x40_checkbox,
+
+        "40x40"
+    },
+    {
+        &game_game_options_normal_50x50_button,
+        &game_game_options_normal_50x50_textblock,
+        &game_game_options_normal_50x50_checkbox,
+
+        "50x50"
+    },
+    {
+        &game_game_options_normal_100x100_button,
+        &game_game_options_normal_100x100_textblock,
+        &game_game_options_normal_100x100_checkbox,
+
+        "100x100"
     }
 };
 
-int total_opts = 5;
+int total_opts = 9;
 
 int page = 0;
+
+int dots_area_w = 25;
+int dots_area_h = 10;
+int dots_area_x = 0;
+int dots_area_y = 0;
+
+Rectangle dots_area;
 
 void game_game_options_render_loop() {
     BeginDrawing();
@@ -70,11 +106,46 @@ void game_game_options_render_loop() {
     //gui_draw_button(game_game_options_normal_4x4, false);
     //gui_draw_button(game_game_options_normal_5x5, false);
 
-    for(int i = 0; i < total_opts; i++) {
-        gui_draw_button(*opts[i].btn, false);
-        gui_draw_textblock(*opts[i].tb);
-        gui_draw_checkbox(*opts[i].cb, false);
+    if(page == 0) {
+        for(int i = 0; i < total_opts; i++) {
+            gui_draw_button(*opts[i].btn, false);
+            gui_draw_textblock(*opts[i].tb);
+            gui_draw_checkbox(*opts[i].cb, false);
+        }
     }
+
+    dots_area_w = 25;
+    dots_area_h = 10;
+    dots_area_x = game_game_options_back_button.rect.x +
+        (game_game_options_back_button.rect.width / 2) - (dots_area_w / 2);
+    /*dots_area_y = game_game_options_back_button.rect.y -
+        game_game_options_back_button.rect.height - (dots_area_h / 2) - 10;*/
+    dots_area_y = game_game_options_next_button.rect.y + (game_game_options_next_button.rect.height / 2)
+         - (dots_area_h / 2) - 2.5;
+
+    dots_area = (Rectangle) {
+        dots_area_x,
+        dots_area_y,
+        dots_area_w,
+        dots_area_h
+    };
+
+    if(IsKeyDown(KEY_F2))
+        gui_draw_rectangle_round(gui_rect_to_round(dots_area), BLUE);
+
+    float c_r = 5;
+    // 2 total pages
+    for(int i = 0; i < 2; i++) {
+        gui_circle_t c = CIR((Vector2){
+            dots_area.x + ((c_r * 2) * i) + (5 * i),
+            dots_area_y
+        }, c_r, 1, true);
+        gui_circle_t c_n = gui_normalise_circle(c);
+        gui_draw_circle_fill(c_n, page == i ? gui_get_color("TEXT") : gui_get_color("BUTTON"));
+    }
+
+    gui_draw_button(game_game_options_previous_button, false);
+    gui_draw_button(game_game_options_next_button, false);
 
     gui_draw_button(game_game_options_back_button, false);
 
@@ -95,7 +166,26 @@ void game_game_options_input_loop() {
     }
 
     if(gui_button_pressed(game_game_options_back_button, MOUSE_BUTTON_LEFT, cursor)) {
+        page = 0;
+        selected = 0;
         game_start_menu();
+    }
+
+    if(gui_button_pressed(game_game_options_previous_button, MOUSE_BUTTON_LEFT, cursor)) {
+        if(page > 0)
+            page--;
+        game_game_options_init();
+    }
+
+    if(gui_button_pressed(game_game_options_next_button, MOUSE_BUTTON_LEFT, cursor)) {
+        if(page == 1) {
+            game_start(selected);
+            page = 0;
+            selected = 0;
+        } else {
+            page++;
+            game_game_options_init();
+        }
     }
 
     /*if(gui_button_pressed(game_game_options_normal_3x3, MOUSE_BUTTON_LEFT, cursor)) {
@@ -110,10 +200,12 @@ void game_game_options_input_loop() {
         game_start(BOARD_5X5);
     }*/
 
-    for(int i = 0; i < total_opts; i++) {
-        if(gui_button_pressed(*opts[i].btn, MOUSE_BUTTON_LEFT, cursor)) {
-            selected = i;
-            game_game_options_init();
+    if(page == 0) {
+        for(int i = 0; i < total_opts; i++) {
+            if(gui_button_pressed(*opts[i].btn, MOUSE_BUTTON_LEFT, cursor)) {
+                selected = i;
+                game_game_options_init();
+            }
         }
     }
 }
@@ -232,6 +324,26 @@ void game_game_options_init() {
     }, true);
     game_game_options_normal_3x3_checkbox.checked = gui_theme == THEME_DARK;*/
 
+    game_game_options_previous_button = BTN((RoundRectangle){
+        35 + x_offset,
+        GetRenderHeight() - y_offset - (35 * 2) - 50,
+        50 * 4,
+        40,
+        0.5
+    }, TXT("Back", 25));
+    game_game_options_previous_button.enabled = page > 0;
+
+    game_game_options_next_button = BTN((RoundRectangle){
+        35 + x_offset,
+        GetRenderHeight() - y_offset - (35 * 2) - 50,
+        50 * 4,
+        40,
+        0.5
+    }, TXT("Next", 25));
+
+    if(page == 1)
+        game_game_options_next_button.text.text = "Start";
+
     game_game_options_back_button = BTN((RoundRectangle){
         35 + x_offset,
         GetRenderHeight() - y_offset - (35 * 2),
@@ -239,6 +351,10 @@ void game_game_options_init() {
         40,
         0.5
     }, TXT("Back to main menu", 25));
+
+    game_game_options_next_button.rect.x = game_game_options_back_button.rect.x + 
+        game_game_options_back_button.rect.width;
+    game_game_options_next_button.rect.x -= game_game_options_next_button.rect.width;
 }
 
 void game_game_options_handle_resize(Rectangle old, Rectangle current) {

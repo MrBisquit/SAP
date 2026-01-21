@@ -82,7 +82,7 @@ void game_options_init() {
             y_offset = 300;
     }
 
-    game_options_title = TXB("Noughts And crosses: Options", 50, (Vector2){
+    game_options_title = TXB("Noughts And Crosses: Options", 50, (Vector2){
         35 + x_offset,
         35 + y_offset
     });
