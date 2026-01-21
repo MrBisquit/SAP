@@ -54,6 +54,26 @@ void game_start(int size) {
         board_w = 550;
         board_h = 550;
         board_size_squares = 10;
+    } else if(size == BOARD_20X20) {
+        board_w = 650;
+        board_h = 650;
+        board_size_squares = 20;
+    } else if(size == BOARD_30X30) {
+        board_w = 750;
+        board_h = 750;
+        board_size_squares = 30;
+    } else if(size == BOARD_40X40) {
+        board_w = 750;
+        board_h = 750;
+        board_size_squares = 40;
+    } else if(size == BOARD_50X50) {
+        board_w = 750;
+        board_h = 750;
+        board_size_squares = 50;
+    } else if(size == BOARD_100X100) {
+        board_w = 750;
+        board_h = 750;
+        board_size_squares = 100;
     }
 }
 
@@ -69,6 +89,16 @@ void game_generate_board(int size) {
         boxes = 5;
     } else if(size == BOARD_10X10) {
         boxes = 10;
+    } else if(size == BOARD_20X20) {
+        boxes = 20;
+    } else if(size == BOARD_30X30) {
+        boxes = 30;
+    } else if(size == BOARD_40X40) {
+        boxes = 40;
+    } else if(size == BOARD_50X50) {
+        boxes = 50;
+    } else if(size == BOARD_100X100) {
+        boxes = 100;
     }
 
     gui_rand_seed();

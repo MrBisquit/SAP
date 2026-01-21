@@ -9,7 +9,12 @@ enum {
     BOARD_3X3 = 0,
     BOARD_4X4 = 1,
     BOARD_5X5 = 2,
-    BOARD_10X10 = 3
+    BOARD_10X10 = 3,
+    BOARD_20X20 = 4,
+    BOARD_30X30 = 5,
+    BOARD_40X40 = 6,
+    BOARD_50X50 = 7,
+    BOARD_100X100 = 8
 };
 
 typedef enum BOARD_PLACE {
